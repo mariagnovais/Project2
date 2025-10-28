@@ -2,10 +2,10 @@ import pandas as pd
 import re
 from pathlib import Path
 
-csv_path = Path(__file__).resolve().parents[2] / 'CourseData.csv'
+csv_path = 'collegeTuitionComplete.csv'
 
 # Read the CSV file
-course_data = pd.read_csv(csv_path, usecols=['Prerequisites'])
+course_data = pd.read_csv(csv_path)
     
 def extract_prereqs(prereq):
     # If nothing is listed as a prerequisite
