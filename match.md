@@ -9,9 +9,19 @@ Datasets.
 - College tuition:
   How to get to table: Choose "SELECT INSTITUTIONS", then "U.S only", and apply. Then, download.
   Website: https://nces.ed.gov/ipeds/SummaryTables/price-trend   
-- https://collegescorecard.ed.gov/data/
   TUPLES: 146,000 
   NOTES: Should we clean it to just have 2023 and also delete the ones that don't have 2023 data (usually bought by another)?
+
+- https://collegescorecard.ed.gov/data/
+  INSTNM - Institution Name
+  STABBR - State abbreviation
+  CONTROL - Public/Private control
+  LOCALE - Urban/Rural classification
+  SAT_AVG - Average SAT score
+  ACTCMMID - Median ACT score
+  ADM_RATE - Admission rate
+  UGDS - Total undergraduate enrollment
+  TUITIONFEE_OUT - Out-of-state tuition and fees
 
 # Dataset overview
 Each row represents one college or city.
