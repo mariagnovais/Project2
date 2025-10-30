@@ -14,9 +14,17 @@ return key_size % size;
 
 class hashmap_of_hashmaps {
 
-std::unordered_map<std::string, std::unordered_map> filter; //the bigger has maps that the keys are categories like, SAT scores, Tuition price, school size.
-
+std::unordered_map<std::string, std::map<int, std::vector<std::string>>> filter; //the bigger has maps that the keys are categories like, SAT scores, Tuition price, school size.
+//unordered map for fast search, map for sorted search and vector for entries that have the same values
 public:
+hashmap_of_hashmaps(){
+    filter["test"];
+};
+
+void add(std::string filt, int value, std::string college_name){
+    filter[filt][value].push_back(college_name);
+};
+
 
 
 
