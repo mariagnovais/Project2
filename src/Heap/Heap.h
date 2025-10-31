@@ -8,25 +8,40 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <fsteam>
+#include <sstream>
+#include <cmath>
+#include <queue>
+#include <iomanip>
 using namespace std;
 
 struct College {
     string name;
     string state;
     double tuition;
-    double admissionRate;
+    double acceptanceRate;
     double avgSAT;
-    double matchScore;
+    string type;
+    double score;
 
-    // Used for max heap ordering
     bool operator<(const College& other) const {
-        return matchScore < other.matchScore;
+        return scor < other.score;
     }
+
 };
 
-// Function prototypes
-double calculateMatchScore(const College& college, double userSAT, double maxTuition, string preferredState);
-vector<College> readCollegeData(const string& filename);
-
+// Function Declerations
+vector<College> loadCSV(const string& filename);
+void computerScores(vector<Collge>& colleges, double wTuition, double wAcceptance, double wSAT);
+vector<College> applyFilters(
+        const vector<College>& all,
+        const string& stateFilter,
+        const string& typeFilter,
+        double maxTuition,
+        double minAcceptance,
+        double minSAT
+);
+void printCollegeShort(const College& c, int rank);
+void printCollegeDetail(const College& c);
 
 #endif //PROJECT2_IML_HEAP_H
