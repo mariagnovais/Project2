@@ -1,33 +1,36 @@
 //
 // Created by Caroline Sholar  on 10/29/25.
 //
-
 #include "Heap.h"
-#include <fstream>
 #include <sstream>
+#include <iomanip>
+#include <fstream>
+#include <iostream>
+#include <algorithm>
+#include <cfloat>
 #include <cmath>
-#include <cfloat>
+using namespace std;
 
-#include "Heap.h"
-#include <cfloat>
+// Helper: trim spaces
+string trim(const string &s) {
+    size_t start = s.find_first_not_of(" \t");
+    if (start == string::npos) return "";
+    size_t end = s.find_last_not_of(" \t");
+    return s.substr(start, end - start + 1);
+}
 
-// Splits a CSV line into parts by comma
+// Split by comma
 vector<string> splitCSV(const string &line) {
     vector<string> parts;
-    string cur;
-    for (char c : line) {
-        if (c == ',') {
-            parts.push_back(cur);
-            cur.clear();
-        } else {
-            cur.push_back(c);
-        }
+    stringstream ss(line);
+    string item;
+    while (getline(ss, item, ',')) {
+        parts.push_back(trim(item));
     }
-    parts.push_back(cur);
     return parts;
 }
 
-// Reads a CSV file and stores colleges
+// Load CSV
 vector<College> loadCSV(const string &filename) {
     vector<College> colleges;
     ifstream file(filename);
@@ -37,38 +40,37 @@ vector<College> loadCSV(const string &filename) {
     }
 
     string header;
-    getline(file, header);
+    getline(file, header); // skip header
 
     string line;
     while (getline(file, line)) {
         if (line.empty()) continue;
         auto cols = splitCSV(line);
-        if (cols.size() < 6) continue;
+        if (cols.size() < 8) continue;
 
         College c;
         c.name = cols[0];
-        c.state = cols[1];
-        try { c.tuition = stod(cols[2]); } catch (...) { c.tuition = NAN; }
-        try {
-            c.acceptance_rate = stod(cols[3]);
-            if (c.acceptance_rate > 1.5) c.acceptance_rate /= 100.0; // convert %
-        } catch (...) { c.acceptance_rate = NAN; }
-        try { c.avg_sat = stod(cols[4]); } catch (...) { c.avg_sat = NAN; }
-        c.type = cols[5];
+        try { c.avg_sat = (cols[1] == "Unknown") ? NAN : stod(cols[1]); } catch (...) { c.avg_sat = NAN; }
+        c.state = cols[2];
+        c.type = cols[3];
+        try { c.acceptance_rate = (cols[5] == "Unknown") ? NAN : stod(cols[5]); } catch (...) { c.acceptance_rate = NAN; }
+        try { c.tuition = (cols[7] == "Unknown") ? NAN : stod(cols[7]); } catch (...) { c.tuition = NAN; }
+
         c.score = 0;
         colleges.push_back(c);
     }
+
     return colleges;
 }
 
-// Simple normalization
+// Normalization
 double normalize(double val, double minv, double maxv) {
     if (isnan(val)) return 0.0;
     if (maxv <= minv) return 0.5;
     return (val - minv) / (maxv - minv);
 }
 
-// Compute a weighted score for each college
+// Compute scores
 void computeScores(vector<College>& colleges, double wTuition, double wAcceptance, double wSAT) {
     double minT = DBL_MAX, maxT = 0;
     double minA = DBL_MAX, maxA = 0;
@@ -92,7 +94,7 @@ void computeScores(vector<College>& colleges, double wTuition, double wAcceptanc
     }
 }
 
-// Filter out unwanted colleges
+// Apply filters
 vector<College> applyFilters(const vector<College>& all,
                              const string& stateFilter,
                              const string& typeFilter,
@@ -100,36 +102,29 @@ vector<College> applyFilters(const vector<College>& all,
                              double minAcceptance,
                              double minSAT) {
     vector<College> out;
+    auto toLower = [](string s) { transform(s.begin(), s.end(), s.begin(), ::tolower); return s; };
 
-    auto toLower = [](string s) {
-        for (auto &ch : s) ch = tolower(ch);
-        return s;
-    };
-
-    string fState = toLower(stateFilter);
-    string fType = toLower(typeFilter);
+    string fState = toLower(trim(stateFilter));
+    string fType = toLower(trim(typeFilter));
 
     for (auto &c : all) {
-        string sState = toLower(c.state);
-        string sType = toLower(c.type);
+        string sState = toLower(trim(c.state));
+        string sType = toLower(trim(c.type));
+        bool skip = false;
 
-        // state/type flexible matching
-        if (!fState.empty() && sState.find(fState) == string::npos) continue;
-        if (!fType.empty() && sType.find(fType) == string::npos) continue;
+        if (!fState.empty() && sState.find(fState) == string::npos) skip = true;
+        if (!fType.empty() && sType.find(fType) == string::npos) skip = true;
+        if (maxTuition > 0 && !isnan(c.tuition) && c.tuition > maxTuition) skip = true;
+        if (!isnan(c.acceptance_rate) && minAcceptance > 0 && c.acceptance_rate < minAcceptance) skip = true;
+        if (!isnan(c.avg_sat) && minSAT > 0 && c.avg_sat < minSAT) skip = true;
 
-        // Tuition filter (only apply if user provided a positive value)
-        if (maxTuition > 0 && !isnan(c.tuition) && c.tuition > maxTuition) continue;
-
-        // Acceptance rate and SAT (default 0 means "no minimum")
-        if (!isnan(c.acceptance_rate) && minAcceptance > 0 && c.acceptance_rate < minAcceptance) continue;
-        if (!isnan(c.avg_sat) && minSAT > 0 && c.avg_sat < minSAT) continue;
-
-        out.push_back(c);
+        if (!skip) out.push_back(c);
     }
 
     return out;
 }
 
+// Print short
 void printCollegeShort(const College &c, int rank) {
     if (rank > 0) cout << rank << ". ";
     cout << c.name << " | " << c.state << " | $" << c.tuition
@@ -139,6 +134,7 @@ void printCollegeShort(const College &c, int rank) {
          << " | Score: " << fixed << setprecision(3) << c.score << "\n";
 }
 
+// Print detailed
 void printCollegeDetail(const College &c) {
     cout << "Name: " << c.name << "\n"
          << "State: " << c.state << "\n"
@@ -148,6 +144,7 @@ void printCollegeDetail(const College &c) {
          << "Type: " << c.type << "\n"
          << "Score: " << c.score << "\n";
 }
+
 
 
 // Main
