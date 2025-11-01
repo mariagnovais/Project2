@@ -13,6 +13,7 @@
 #include <cmath>
 #include <queue>
 #include <iomanip>
+#include <cfloat>
 using namespace std;
 
 struct College {
