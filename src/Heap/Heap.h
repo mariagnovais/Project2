@@ -8,7 +8,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <fsteam>
+#include <fstream>
 #include <sstream>
 #include <cmath>
 #include <queue>
@@ -16,7 +16,8 @@
 #include <cfloat>
 using namespace std;
 
-struct College {
+struct College
+{
     string name;
     string state;
     double tuition;
@@ -25,24 +26,23 @@ struct College {
     string type;
     double score;
 
-    bool operator<(const College& other) const {
-        return scor < other.score;
+    bool operator<(const College &other) const
+    {
+        return score < other.score;
     }
-
 };
 
 // Function Declerations
-vector<College> loadCSV(const string& filename);
-void computerScores(vector<Collge>& colleges, double wTuition, double wAcceptance, double wSAT);
+vector<College> loadCSV(const string &filename);
+void computerScores(vector<College> &colleges, double wTuition, double wAcceptance, double wSAT);
 vector<College> applyFilters(
-        const vector<College>& all,
-        const string& stateFilter,
-        const string& typeFilter,
-        double maxTuition,
-        double minAcceptance,
-        double minSAT
-);
-void printCollegeShort(const College& c, int rank);
-void printCollegeDetail(const College& c);
+    const vector<College> &all,
+    const string &stateFilter,
+    const string &typeFilter,
+    double maxTuition,
+    double minAcceptance,
+    double minSAT);
+void printCollegeShort(const College &c, int rank);
+void printCollegeDetail(const College &c);
 
-#endif //PROJECT2_IML_HEAP_H
+#endif // PROJECT2_IML_HEAP_H
