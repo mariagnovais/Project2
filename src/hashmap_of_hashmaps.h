@@ -21,10 +21,12 @@ hashmap_of_hashmaps(){
     filter["test"];
 };
 
+//adder
 void add(std::string filt, int value, std::string college_name){
     filter[filt][value].push_back(college_name);
 };
 
+//get the certain category
 std::map<int, std::vector<std::string>>* get_category(std::string filter){
 auto it = filter.find(filter);
 if (it == filter.end()) {
@@ -32,6 +34,7 @@ return nullptr;}
 return &(it->second);
 }
 
+//print the whole category
 void print_whole_category(std::string filter){
 auto filt = get_filter(filter);
 if (!filt){
@@ -49,8 +52,43 @@ if (i+1 < schools.size()){
 std::cout<< "< ";}
 }
 }
-
 std::cout<<std::endl;
+}
+
+std::vector<std::string> top_n_colleges(std::string filter, int n){
+std::vector<std::string> output;
+auto filt = get_filter(filter);
+if (!filt){
+return output;}
+
+//this gets the top n colleges of the hashmap which is already ordered
+for (auto it = filt->rbegin(); it != filt->rend(); ++it){
+std::vector<std::string> schools = it->second;
+for (int i = 0; i < (int)schools.size(); i++){
+output.push_back(schools[i]);
+if ((int)output.size() == n){
+return output;
+}
+}
+return output;
+}
+
+//and this gets the bottom n colleges
+std::vector<std::string> bottom_n_colleges(std::string filter, int n){
+std::vector<std::string> output;
+auto filt = get_filter(filter);
+if (!filt){
+return output;}
+
+for (auto it = filt->begin(); it != filt->end(); ++it){
+std::vector<std::string> schools = it->second;
+for (int i = 0; i < (int)schools.size(); i++){
+output.push_back(schools[i]);
+if ((int)output.size() == n){
+return output;
+}
+}
+return output;
 }
 
 
