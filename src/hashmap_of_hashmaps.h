@@ -25,10 +25,34 @@ void add(std::string filt, int value, std::string college_name){
     filter[filt][value].push_back(college_name);
 };
 
+std::map<int, std::vector<std::string>>* get_category(std::string filter){
+auto it = filter.find(filter);
+if (it == filter.end()) {
+return nullptr;}
+return &(it->second);
+}
 
+void print_whole_category(std::string filter){
+auto filt = get_filter(filter);
+if (!filt){
+std::cout<<"No filter found"<<std::endl;
+return;
+}
 
+std::cout<<"Filter: "<< filter <<std::endl;
 
-};
+for (auto&[value, schools] : *filt){
+std::cout<< " " << value <<": ";
+for (int i = 0; i < schools.size(); i++){
+std::cout<<schools[i];
+if (i+1 < schools.size()){
+std::cout<< "< ";}
+}
+}
+
+std::cout<<std::endl;
+}
+
 
 
 #endif //PROJECT2_HASHMAP_OF_HASHMAPS_H
