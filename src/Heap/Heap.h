@@ -1,48 +1,52 @@
-//
-// Created by Caroline Sholar  on 10/29/25.
-//
 
 #ifndef PROJECT2_IML_HEAP_H
 #define PROJECT2_IML_HEAP_H
 
 #include <iostream>
-#include <string>
 #include <vector>
+#include <string>
 #include <fstream>
 #include <sstream>
 #include <cmath>
 #include <queue>
 #include <iomanip>
-#include <cfloat>
 using namespace std;
 
-struct College
-{
+struct College {
     string name;
     string state;
     double tuition;
-    double acceptanceRate;
-    double avgSAT;
+    double acceptance_rate;
+    double avg_sat;
     string type;
     double score;
 
-    bool operator<(const College &other) const
-    {
-        return score < other.score;
+    // For priority_queue (max-heap)
+    bool operator<(const College& other) const {
+        return score < other.score; // higher score = higher priority
     }
 };
 
-// Function Declerations
-vector<College> loadCSV(const string &filename);
-void computerScores(vector<College> &colleges, double wTuition, double wAcceptance, double wSAT);
-vector<College> applyFilters(
-    const vector<College> &all,
-    const string &stateFilter,
-    const string &typeFilter,
-    double maxTuition,
-    double minAcceptance,
-    double minSAT);
-void printCollegeShort(const College &c, int rank);
-void printCollegeDetail(const College &c);
+// Comparator for priority_queue (alternative heap control)
+struct CompareCollegeScore {
+    bool operator()(const College& a, const College& b) const {
+        return a.score < b.score; // max-heap by score
+    }
+};
+
+// Function declarations
+vector<College> loadCSV(const string& filename);
+void computeScores(vector<College>& colleges, double wTuition, double wAcceptance, double wSAT);
+vector<College> applyFilters(const vector<College>& all,
+                             const string& stateFilter,
+                             const string& typeFilter,
+                             double maxTuition,
+                             double minAcceptance,
+                             double minSAT);
+void printCollegeShort(const College& c, int rank);
+void printCollegeDetail(const College& c);
+void displayTopColleges(const vector<College>& colleges); // NEW — heap-based ranking
+
+#endif
 
 #endif // PROJECT2_IML_HEAP_H
