@@ -45,8 +45,7 @@ vector<College> applyFilters(const vector<College>& all,
                              double minSAT);
 void printCollegeShort(const College& c, int rank);
 void printCollegeDetail(const College& c);
-void displayTopColleges(const vector<College>& colleges); // NEW — heap-based ranking
+void displayTopColleges(const vector<College>& colleges);
 
-#endif
 
 #endif // PROJECT2_IML_HEAP_H

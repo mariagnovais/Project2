@@ -1,4 +1,3 @@
-
 #include "Heap.h"
 #include <sstream>
 #include <iomanip>
@@ -40,7 +39,7 @@ vector<College> loadCSV(const string &filename) {
     }
 
     string header;
-    getline(file, header);
+    getline(file, header); // skip header
 
     string line;
     while (getline(file, line)) {
@@ -164,89 +163,3 @@ void displayTopColleges(const vector<College>& colleges) {
         rank++;
     }
 }
-
-
-// Main
-/*
-
-#include "Heap.h"
-#include <queue>
-#include <iostream>
-#include <unordered_set>
-using namespace std;
-
-int main() {
-    // Load the CSV file
-    vector<College> all = loadCSV("college_data_cleaned_100k copy.csv");
-
-    if (all.empty()) {
-        cerr << "Error: CSV file could not be loaded.\n";
-        return 1;
-    }
-
-    cout << "Welcome to College Matcher!\n";
-
-    // STEP 1: Ask for filters
-    cout << "Enter your preferred state (or press Enter to skip): ";
-    string state;
-    getline(cin, state);
-
-    cout << "Would you prefer Public or Private? (or press Enter to skip): ";
-    string type;
-    getline(cin, type);
-
-    cout << "Enter your maximum tuition (or press Enter for no max): ";
-    string tuitionStr;
-    getline(cin, tuitionStr);
-    double maxTuition = tuitionStr.empty() ? -1 : stod(tuitionStr);
-
-    cout << "Enter your minimum acceptance rate (e.g., 0.3 for 30%, or press Enter for no min): ";
-    string accStr;
-    getline(cin, accStr);
-    double minAcceptance = accStr.empty() ? 0 : stod(accStr);
-
-    cout << "Enter your minimum SAT score (or press Enter for no min): ";
-    string satStr;
-    getline(cin, satStr);
-    double minSAT = satStr.empty() ? 0 : stod(satStr);
-
-    // STEP 2: Ask for weights
-    cout << "\nSet your weighting preferences (total doesn’t need to equal 1):\n";
-    double wTuition, wAcceptance, wSAT;
-    cout << "Weight for tuition importance: ";
-    cin >> wTuition;
-    cout << "Weight for acceptance rate importance: ";
-    cin >> wAcceptance;
-    cout << "Weight for SAT importance: ";
-    cin >> wSAT;
-
-    // Compute scores
-    computeScores(all, wTuition, wAcceptance, wSAT);
-
-    // Filter colleges
-    cout << "\nFiltering colleges...\n";
-    vector<College> filtered = applyFilters(all, state, type, maxTuition, minAcceptance, minSAT);
-    cout << "Colleges matching filters: " << filtered.size() << "\n";
-    if (filtered.empty()) {
-        cout << "No colleges matched your criteria.\n";
-        return 0;
-    }
-
-    // Remove duplicates by name + state
-    vector<College> uniqueColleges;
-    unordered_set<string> seenKeys;
-    for (auto &c : filtered) {
-        string key = c.name + "|" + c.state;
-        if (seenKeys.find(key) == seenKeys.end()) {
-            uniqueColleges.push_back(c);
-            seenKeys.insert(key);
-        }
-    }
-
-    // Uses the priority queue inside displayTopColleges()
-    displayTopColleges(uniqueColleges);
-
-    return 0;
-}
-
-*/
