@@ -1,13 +1,13 @@
 import pandas as pd
 
-# NAMES
-# csv_path = 'data\college_data_cleaned_100k.csv'
+# NAMES CLEANING
+csv_path = 'data\college_data_cleaned_100k.csv'
 
 # # Read the CSV file
-# inst_name = pd.read_csv(csv_path, usecols=['college_name'])
+inst_name = pd.read_csv(csv_path)
 
 # #Remove duplicates
-# inst_name = inst_name.drop_duplicates()
+inst_name = inst_name.drop_duplicates(subset=['college_name'])
 
 # # Save only the institution names to a new CSV file 
 # names = inst_name
@@ -44,12 +44,12 @@ import pandas as pd
 # names.to_csv(output_csv_path, index=False)
 
 # Compare differences in institution names between two files
-csv_path1 = r"data\only_names.csv"
-csv_path2 = r"data\only_namesmajorfile.csv"
+# csv_path1 = r"data\only_names.csv"
+# csv_path2 = r"data\only_namesmajorfile.csv"
 
-# Read the CSV files
-names1 = pd.read_csv(csv_path1)
-names2 = pd.read_csv(csv_path2)
+# # Read the CSV files
+# names1 = pd.read_csv(csv_path1)
+# names2 = pd.read_csv(csv_path2)
 
 # Find names in names2 that are not in names1
 # differences = names1[~names1['college_name'].isin(names2['INSTNM'])] 
@@ -57,7 +57,32 @@ names2 = pd.read_csv(csv_path2)
 # print(differences)
 
 # len
-len1 = len(names1)
-len2 = len(names2)
-print(f"Number of unique institution names in only_names.csv: {len1}")
-print(f"Number of unique institution names in only_namesmajorfile.csv: {len2}")
+# len1 = len(names1)
+# len2 = len(names2)
+# print(f"Number of unique institution names in only_names.csv: {len1}")
+# print(f"Number of unique institution names in only_namesmajorfile.csv: {len2}")
+
+# # Save majors
+# csv_path = r"data\majors.csv"
+
+# # Read the CSV file
+# majors = pd.read_csv(csv_path, usecols=['CIPDESC'])
+
+# #Remove duplicates
+# majors = majors.drop_duplicates()
+
+# # Remove ' "" ' and "." from the major names
+# def nopoints_names(s : pd.Series) -> pd.Series:
+#    s = s.astype(str)
+#    s = s.str.replace('"', '', regex= False)
+#    s = s.str.replace(r"\.", "", regex=True)
+#    s =  s.str.replace(r"\s+", " ", regex=True)
+#    return s
+
+
+# majors['CIPDESC'] = nopoints_names(majors['CIPDESC'])
+
+# print(majors.head())
+# # Save only the filtered to a new CSV file
+# output_csv_path = r"data\only_majorsname.csv"
+# majors.to_csv(output_csv_path, index=False)
