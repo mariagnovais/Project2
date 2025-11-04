@@ -8,7 +8,6 @@ add_executable(Project2
         src/main.cpp
         src/hashmap_of_hashmaps.cpp
         src/helpers.cpp
-        src/UserInterface.cpp
         src/Heap.cpp
 )
 
