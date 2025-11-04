@@ -1,5 +1,7 @@
 import pandas as pd
+import numpy as np
 import random
+
 def merging_datasets():
     # Normalize institution names
     def normalize_names(s : pd.Series) -> pd.Series:
@@ -33,6 +35,9 @@ def merging_datasets():
     # drop the normalized name column
     merged = merged.drop(columns=['inst_name'])
 
+    # treat empty strings as NaN
+    merged['CIPDESC'] = merged['CIPDESC'].replace(r'^s*$', np.nan, regex=True)
+
     # Save the merged data to a new CSV file
     output_csv_path = r"data\merged_data.csv"
     merged.to_csv(output_csv_path, index=False)
@@ -40,13 +45,17 @@ def merging_datasets():
 
 # merging_datasets()
 
+
 # creating random data for colleges that don't have majors
 def add_majors(df : pd.DataFrame) -> pd.DataFrame:
 
+    merged_path = r"data\merged_data.csv"
+    merged = pd.read_csv(merged_path)
     csv_path_majors = r"data\only_majorsname.csv"
     majors = pd.read_csv(csv_path_majors)
     majors_list = majors['CIPDESC'].tolist()
-
+    missing = merged['CIPDESC'].isna().sum()
+    print(f"Number of missing majors before filling: {missing}")
     def assign_random_major(row):
         if pd.isnull(row['CIPDESC']):
             return random.choice(majors_list)
@@ -54,8 +63,17 @@ def add_majors(df : pd.DataFrame) -> pd.DataFrame:
             return row['CIPDESC']
 
     df['CIPDESC'] = df.apply(assign_random_major, axis=1)
+    return df
 
-merged_data = pd.read_csv(r"data\merged_data.csv")
-merged_data_filled = add_majors(merged_data)
-output_csv_path_filled = r"data\merged_data_filled.csv"
-merged_data_filled.to_csv(output_csv_path_filled, index=False)
+# merged_data = pd.read_csv(r"data\merged_data.csv")
+# mergedFill= add_majors(merged_data)
+# output_csv_path_filled = r"data\merged_data_filled.csv"
+# mergedFill.to_csv(output_csv_path_filled, index=False)
+
+merged_path = r"data\merged_data.csv"
+merged = pd.read_csv(merged_path)
+csv_path_majors = r"data\only_majorsname.csv"
+majors = pd.read_csv(csv_path_majors)
+majors_list = majors['CIPDESC'].tolist()
+missing = merged[merged['CIPDESC'].isna()]
+print(f"Number of missing majors before filling: {missing}")

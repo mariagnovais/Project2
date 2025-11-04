@@ -1,19 +1,19 @@
 import pandas as pd
 
 # NAMES CLEANING
-csv_path = 'data\college_data_cleaned_100k.csv'
+# csv_path = 'data\college_data_cleaned_100k.csv'
 
-# Read the CSV file
-data = pd.read_csv(csv_path)
+# # Read the CSV file
+# data = pd.read_csv(csv_path)
 
-#Remove duplicates
-data = data.drop_duplicates(subset=['college_name'], keep='first')
+# #Remove duplicates
+# data = data.drop_duplicates(subset=['college_name'], keep='first')
 
 
-# Save only the institution names to a new CSV file 
-newdata = data
-output_csv_path = 'data\college_data.csv'
-newdata.to_csv(output_csv_path, index=False)
+# # Save only the institution names to a new CSV file 
+# newdata = data
+# output_csv_path = 'data\college_data.csv'
+# newdata.to_csv(output_csv_path, index=False)
 
 
 #MAJORS
@@ -64,26 +64,26 @@ newdata.to_csv(output_csv_path, index=False)
 # print(f"Number of unique institution names in only_namesmajorfile.csv: {len2}")
 
 # # Save majors
-# csv_path = r"data\majors.csv"
+csv_path = r"data\majors.csv"
 
 # # Read the CSV file
-# majors = pd.read_csv(csv_path, usecols=['CIPDESC'])
+majors = pd.read_csv(csv_path, usecols=['CIPCODE', 'CIPDESC'])
 
-# #Remove duplicates
-# majors = majors.drop_duplicates()
+#Remove duplicates
+majors = majors.drop_duplicates()
 
-# # Remove ' "" ' and "." from the major names
-# def nopoints_names(s : pd.Series) -> pd.Series:
-#    s = s.astype(str)
-#    s = s.str.replace('"', '', regex= False)
-#    s = s.str.replace(r"\.", "", regex=True)
-#    s =  s.str.replace(r"\s+", " ", regex=True)
-#    return s
+# Remove ' "" ' and "." from the major names
+def nopoints_names(s : pd.Series) -> pd.Series:
+   s = s.astype(str)
+   s = s.str.replace('"', '', regex= False)
+   s = s.str.replace(r"\.", "", regex=True)
+   s =  s.str.replace(r"\s+", " ", regex=True)
+   return s
 
 
-# majors['CIPDESC'] = nopoints_names(majors['CIPDESC'])
+majors['CIPDESC'] = nopoints_names(majors['CIPDESC'])
 
-# print(majors.head())
-# # Save only the filtered to a new CSV file
-# output_csv_path = r"data\only_majorsname.csv"
-# majors.to_csv(output_csv_path, index=False)
+print(majors.head())
+# Save only the filtered to a new CSV file
+output_csv_path = r"data\only_majorsname.csv"
+majors.to_csv(output_csv_path, index=False)
