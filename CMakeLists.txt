@@ -9,8 +9,10 @@ add_executable(Project2
         src/hashmap_of_hashmaps.cpp
         src/helpers.cpp
         src/UserInterface.cpp
+        src/Heap.cpp
 )
 
 target_include_directories(Project2 PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src
+
 )

@@ -1,6 +1,3 @@
-//
-// Created by Caroline Sholar  on 10/29/25.
-//
 #include "Heap.h"
 #include <sstream>
 #include <iomanip>
@@ -9,7 +6,9 @@
 #include <algorithm>
 #include <cfloat>
 #include <cmath>
+#include <queue>
 using namespace std;
+
 
 // Helper: trim spaces
 string trim(const string &s) {
@@ -19,7 +18,7 @@ string trim(const string &s) {
     return s.substr(start, end - start + 1);
 }
 
-// Split by comma
+// Split CSV line by comma
 vector<string> splitCSV(const string &line) {
     vector<string> parts;
     stringstream ss(line);
@@ -63,19 +62,20 @@ vector<College> loadCSV(const string &filename) {
     return colleges;
 }
 
-// Normalization
+// Normalize a value between min and max
 double normalize(double val, double minv, double maxv) {
     if (isnan(val)) return 0.0;
     if (maxv <= minv) return 0.5;
     return (val - minv) / (maxv - minv);
 }
 
-// Compute scores
+// Compute weighted scores (0–1)
 void computeScores(vector<College>& colleges, double wTuition, double wAcceptance, double wSAT) {
     double minT = DBL_MAX, maxT = 0;
     double minA = DBL_MAX, maxA = 0;
     double minS = DBL_MAX, maxS = 0;
 
+    // Find min/max for normalization
     for (auto &c : colleges) {
         if (!isnan(c.tuition)) { minT = min(minT, c.tuition); maxT = max(maxT, c.tuition); }
         if (!isnan(c.acceptance_rate)) { minA = min(minA, c.acceptance_rate); maxA = max(maxA, c.acceptance_rate); }
@@ -83,14 +83,14 @@ void computeScores(vector<College>& colleges, double wTuition, double wAcceptanc
     }
 
     for (auto &c : colleges) {
-        double tuitionScore = 1.0 - normalize(c.tuition, minT, maxT);
-        double acceptanceScore = normalize(c.acceptance_rate, minA, maxA);
-        double satScore = normalize(c.avg_sat, minS, maxS);
+        double tuitionScore = isnan(c.tuition) ? 0 : (maxT - c.tuition) / (maxT - minT);
+        double accScore = isnan(c.acceptance_rate) ? 0 : (c.acceptance_rate - minA) / (maxA - minA);
+        double satScore = isnan(c.avg_sat) ? 0 : (c.avg_sat - minS) / (maxS - minS);
 
         double totalW = wTuition + wAcceptance + wSAT;
         if (totalW <= 0) totalW = 1;
 
-        c.score = (tuitionScore * wTuition + acceptanceScore * wAcceptance + satScore * wSAT) / totalW;
+        c.score = (tuitionScore * wTuition + accScore * wAcceptance + satScore * wSAT) / totalW;
     }
 }
 
@@ -124,106 +124,42 @@ vector<College> applyFilters(const vector<College>& all,
     return out;
 }
 
-// Print short
+// Print short version (score as 0–100 integer)
 void printCollegeShort(const College &c, int rank) {
     if (rank > 0) cout << rank << ". ";
-    cout << c.name << " | " << c.state << " | $" << c.tuition
-         << " | Acc: " << (c.acceptance_rate * 100) << "%"
-         << " | SAT: " << c.avg_sat
+    cout << c.name << " | " << c.state
+         << " | $" << fixed << setprecision(2) << c.tuition
+         << " | Acc: " << fixed << setprecision(0) << (c.acceptance_rate * 100) << "%"
+         << " | SAT: " << fixed << setprecision(0) << c.avg_sat
          << " | " << c.type
-         << " | Score: " << fixed << setprecision(3) << c.score << "\n";
+         << " | Score: " << fixed << setprecision(0) << (c.score * 100) << "\n";
 }
 
-// Print detailed
+// Print detailed version (score as 0–100 integer)
 void printCollegeDetail(const College &c) {
     cout << "Name: " << c.name << "\n"
          << "State: " << c.state << "\n"
-         << "Tuition: $" << c.tuition << "\n"
-         << "Acceptance Rate: " << (c.acceptance_rate * 100) << "%\n"
-         << "Average SAT: " << c.avg_sat << "\n"
+         << "Tuition: $" << fixed << setprecision(2) << c.tuition << "\n"
+         << "Acceptance Rate: " << fixed << setprecision(0) << (c.acceptance_rate * 100) << "%\n"
+         << "Average SAT: " << fixed << setprecision(0) << c.avg_sat << "\n"
          << "Type: " << c.type << "\n"
-         << "Score: " << c.score << "\n";
+         << "Score: " << fixed << setprecision(0) << (c.score * 100) << "\n";
 }
 
+// Display top 10 using a priority queue (heap)
+void displayTopColleges(const vector<College>& colleges) {
+    priority_queue<College, vector<College>, CompareCollegeScore> pq;
 
-
-// Main
-/*
-
-#include "College.h"
-
-int main() {
-    //  Load both CSV files
-    vector<College> tuitionData = loadCSV("collegeTuitionComplete copy.csv");
-    vector<College> mergedData = loadCSV("MERGED2023_24_PP copy.csv");
-
-    // Combine them into one big vector (you can refine this merge later)
-    vector<College> all = tuitionData;
-    all.insert(all.end(), mergedData.begin(), mergedData.end());
-
-    if (all.empty()) {
-        cerr << "Error: One or both CSV files could not be loaded.\n";
-        return 1;
-    }
-
-    cout << "Welcome to College Matcher!\n";
-
-    // STEP 1: Ask for filters
-    cout << "Enter your preferred state (or press Enter to skip): ";
-    string state;
-    getline(cin, state);
-
-    cout << "Would you prefer Public or Private? (or press Enter to skip): ";
-    string type;
-    getline(cin, type);
-
-    cout << "Enter your maximum tuition (or press Enter for no max): ";
-    string tuitionStr;
-    getline(cin, tuitionStr);
-    double maxTuition = tuitionStr.empty() ? -1 : stod(tuitionStr);
-
-    cout << "Enter your minimum acceptance rate (e.g., 0.3 for 30%, or press Enter for no min): ";
-    string accStr;
-    getline(cin, accStr);
-    double minAcceptance = accStr.empty() ? 0 : stod(accStr);
-
-    cout << "Enter your minimum SAT score (or press Enter for no min): ";
-    string satStr;
-    getline(cin, satStr);
-    double minSAT = satStr.empty() ? 0 : stod(satStr);
-
-    // Ask for weights
-    cout << "\nSet your weighting preferences (total doesn’t need to equal 1):\n";
-    double wTuition, wAcceptance, wSAT;
-    cout << "Weight for tuition importance: ";
-    cin >> wTuition;
-    cout << "Weight for acceptance rate importance: ";
-    cin >> wAcceptance;
-    cout << "Weight for SAT importance: ";
-    cin >> wSAT;
-
-    // Compute scores and apply filters
-    computeScores(all, wTuition, wAcceptance, wSAT);
-    vector<College> filtered = applyFilters(all, state, type, maxTuition, minAcceptance, minSAT);
-
-    if (filtered.empty()) {
-        cout << "No colleges matched your criteria.\n";
-        return 0;
-    }
-
-    //  Create priority queue and print top 10
-    priority_queue<College> pq;
-    for (auto &c : filtered) {
+    for (auto &c : colleges) {
         pq.push(c);
     }
 
     cout << "\nTop 10 College Matches (by Score):\n";
-    for (int i = 1; i <= 10 && !pq.empty(); i++) {
+    int rank = 1;
+    while (!pq.empty() && rank <= 10) {
         College top = pq.top();
         pq.pop();
-        printCollegeShort(top, i);
+        printCollegeShort(top, rank);
+        rank++;
     }
-
-    return 0;
 }
-*/
