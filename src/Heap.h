@@ -8,8 +8,9 @@
 #include <fstream>
 #include <sstream>
 #include <cmath>
-#include <queue>
 #include <iomanip>
+#include <algorithm>
+
 using namespace std;
 
 struct College {
@@ -21,17 +22,33 @@ struct College {
     string type;
     double score;
 
-    // For priority_queue (max-heap)
+    // Comparison for max-heap: bigger score first, then cheaper tuition, then higher SAT
     bool operator<(const College& other) const {
-        return score < other.score; // higher score = higher priority
+        // first check score
+        if (isnan(score) && !isnan(other.score)) return true;
+        if (!isnan(score) && isnan(other.score)) return false;
+        if (!isnan(score) && !isnan(other.score) && fabs(score - other.score) > 1e-6)
+            return score < other.score;
+
+        // then check tuition
+        if (isnan(tuition) && !isnan(other.tuition)) return true;
+        if (!isnan(tuition) && isnan(other.tuition)) return false;
+        if (!isnan(tuition) && !isnan(other.tuition) && fabs(tuition - other.tuition) > 1e-6)
+            return tuition > other.tuition; // cheaper is better
+
+        // finally check SAT
+        if (isnan(avg_sat) && !isnan(other.avg_sat)) return true;
+        if (!isnan(avg_sat) && isnan(other.avg_sat)) return false;
+        return avg_sat < other.avg_sat; // higher SAT is better
     }
 };
 
-// Comparator for priority_queue (alternative heap control)
-struct CompareCollegeScore {
-    bool operator()(const College& a, const College& b) const {
-        return a.score < b.score; // max-heap by score
-    }
+struct CollegeHeap {
+    vector<College> heap;
+
+    void push(const College& c);
+    College pop();
+    bool empty() const { return heap.empty(); }
 };
 
 // Function declarations
@@ -44,7 +61,6 @@ vector<College> applyFilters(const vector<College>& all,
                              double minAcceptance,
                              double minSAT);
 void printCollegeShort(const College& c, int rank);
-void printCollegeDetail(const College& c);
 void displayTopColleges(const vector<College>& colleges);
 
 

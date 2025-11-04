@@ -1,25 +1,23 @@
 #include "Heap.h"
-#include <sstream>
-#include <iomanip>
-#include <fstream>
-#include <iostream>
-#include <algorithm>
 #include <cfloat>
 #include <cmath>
-#include <queue>
+#include <sstream>
+#include <algorithm>
+#include <iostream>
+#include <fstream>
+
 using namespace std;
 
-
-// Helper: trim spaces
-string trim(const string &s) {
+// Trim spaces
+static string trim(const string &s) {
     size_t start = s.find_first_not_of(" \t");
     if (start == string::npos) return "";
     size_t end = s.find_last_not_of(" \t");
     return s.substr(start, end - start + 1);
 }
 
-// Split CSV line by comma
-vector<string> splitCSV(const string &line) {
+// Split CSV line
+static vector<string> splitCSV(const string &line) {
     vector<string> parts;
     stringstream ss(line);
     string item;
@@ -54,7 +52,6 @@ vector<College> loadCSV(const string &filename) {
         c.type = cols[3];
         try { c.acceptance_rate = (cols[5] == "Unknown") ? NAN : stod(cols[5]); } catch (...) { c.acceptance_rate = NAN; }
         try { c.tuition = (cols[7] == "Unknown") ? NAN : stod(cols[7]); } catch (...) { c.tuition = NAN; }
-
         c.score = 0;
         colleges.push_back(c);
     }
@@ -62,30 +59,27 @@ vector<College> loadCSV(const string &filename) {
     return colleges;
 }
 
-// Normalize a value between min and max
-double normalize(double val, double minv, double maxv) {
-    if (isnan(val)) return 0.0;
-    if (maxv <= minv) return 0.5;
-    return (val - minv) / (maxv - minv);
-}
-
-// Compute weighted scores (0–1)
+// Compute weighted scores
 void computeScores(vector<College>& colleges, double wTuition, double wAcceptance, double wSAT) {
     double minT = DBL_MAX, maxT = 0;
     double minA = DBL_MAX, maxA = 0;
     double minS = DBL_MAX, maxS = 0;
 
-    // Find min/max for normalization
     for (auto &c : colleges) {
         if (!isnan(c.tuition)) { minT = min(minT, c.tuition); maxT = max(maxT, c.tuition); }
         if (!isnan(c.acceptance_rate)) { minA = min(minA, c.acceptance_rate); maxA = max(maxA, c.acceptance_rate); }
         if (!isnan(c.avg_sat)) { minS = min(minS, c.avg_sat); maxS = max(maxS, c.avg_sat); }
     }
 
+    // Prevent divide-by-zero
+    double tuitionRange = (maxT - minT == 0) ? 1 : (maxT - minT);
+    double acceptanceRange = (maxA - minA == 0) ? 1 : (maxA - minA);
+    double satRange = (maxS - minS == 0) ? 1 : (maxS - minS);
+
     for (auto &c : colleges) {
-        double tuitionScore = isnan(c.tuition) ? 0 : (maxT - c.tuition) / (maxT - minT);
-        double accScore = isnan(c.acceptance_rate) ? 0 : (c.acceptance_rate - minA) / (maxA - minA);
-        double satScore = isnan(c.avg_sat) ? 0 : (c.avg_sat - minS) / (maxS - minS);
+        double tuitionScore = isnan(c.tuition) ? 0 : (maxT - c.tuition) / tuitionRange;
+        double accScore = isnan(c.acceptance_rate) ? 0 : (c.acceptance_rate - minA) / acceptanceRange;
+        double satScore = isnan(c.avg_sat) ? 0 : (c.avg_sat - minS) / satRange;
 
         double totalW = wTuition + wAcceptance + wSAT;
         if (totalW <= 0) totalW = 1;
@@ -124,7 +118,7 @@ vector<College> applyFilters(const vector<College>& all,
     return out;
 }
 
-// Print short version (score as 0–100 integer)
+// Print college
 void printCollegeShort(const College &c, int rank) {
     if (rank > 0) cout << rank << ". ";
     cout << c.name << " | " << c.state
@@ -135,30 +129,56 @@ void printCollegeShort(const College &c, int rank) {
          << " | Score: " << fixed << setprecision(0) << (c.score * 100) << "\n";
 }
 
-// Print detailed version (score as 0–100 integer)
-void printCollegeDetail(const College &c) {
-    cout << "Name: " << c.name << "\n"
-         << "State: " << c.state << "\n"
-         << "Tuition: $" << fixed << setprecision(2) << c.tuition << "\n"
-         << "Acceptance Rate: " << fixed << setprecision(0) << (c.acceptance_rate * 100) << "%\n"
-         << "Average SAT: " << fixed << setprecision(0) << c.avg_sat << "\n"
-         << "Type: " << c.type << "\n"
-         << "Score: " << fixed << setprecision(0) << (c.score * 100) << "\n";
+// Heap push/pop (max-heap)
+void CollegeHeap::push(const College& c) {
+    heap.push_back(c);
+    int i = heap.size() - 1;
+    while (i > 0) {
+        int parent = (i - 1) / 2;
+        if (heap[parent] < heap[i]) { // child has higher priority
+            swap(heap[parent], heap[i]);
+            i = parent;
+        } else break;
+    }
 }
 
-// Display top 10 using a priority queue (heap)
-void displayTopColleges(const vector<College>& colleges) {
-    priority_queue<College, vector<College>, CompareCollegeScore> pq;
+College CollegeHeap::pop() {
+    if (heap.empty()) throw runtime_error("Heap is empty");
+    College top = heap[0];
+    heap[0] = heap.back();
+    heap.pop_back();
 
-    for (auto &c : colleges) {
-        pq.push(c);
+    int i = 0, n = heap.size();
+    while (true) {
+        int left = 2 * i + 1, right = 2 * i + 2;
+        int largest = i;
+        if (left < n && heap[largest] < heap[left]) largest = left;
+        if (right < n && heap[largest] < heap[right]) largest = right;
+        if (largest == i) break;
+        swap(heap[i], heap[largest]);
+        i = largest;
     }
 
-    cout << "\nTop 10 College Matches (by Score):\n";
+    return top;
+}
+
+// Display top colleges (top 10)
+void displayTopColleges(const vector<College>& colleges) {
+    CollegeHeap heap;
+
+    int pushed = 0;
+    for (auto &c: colleges) {
+        if (!isnan(c.score) && !isnan(c.tuition) && !isnan(c.acceptance_rate) && !isnan(c.avg_sat)) {
+            heap.push(c);
+            pushed++;
+        }
+    }
+    cout << "Colleges pushed to heap: " << pushed << endl;
+
     int rank = 1;
-    while (!pq.empty() && rank <= 10) {
-        College top = pq.top();
-        pq.pop();
+    int limit = min(10, (int) colleges.size());
+    while (!heap.empty() && rank <= limit) {
+        College top = heap.pop();
         printCollegeShort(top, rank);
         rank++;
     }
