@@ -1,5 +1,5 @@
 import pandas as pd
-
+import random
 def merging_datasets():
     # Normalize institution names
     def normalize_names(s : pd.Series) -> pd.Series:
@@ -15,7 +15,7 @@ def merging_datasets():
         s =  s.str.replace(r"\s+", " ", regex=True)
         return s
 
-    csv_path1 = r"data\college_data_cleaned_100k.csv"
+    csv_path1 = r"data\college_data.csv"
     csv_path2 = r"data\majors.csv"
 
     # Read the CSV files
@@ -36,12 +36,26 @@ def merging_datasets():
     # Save the merged data to a new CSV file
     output_csv_path = r"data\merged_data.csv"
     merged.to_csv(output_csv_path, index=False)
-    return merged
+    return 
 
-#merging_datasets()
+# merging_datasets()
 
-# add majors to empty rows
-def print_empty_majors(df: pd.DataFrame):
-        empty_rows = df[df['CIPDESC'].isnull()]
-        print("Rows with empty CIPDESC:")
-        print(empty_rows)
+# creating random data for colleges that don't have majors
+def add_majors(df : pd.DataFrame) -> pd.DataFrame:
+
+    csv_path_majors = r"data\only_majorsname.csv"
+    majors = pd.read_csv(csv_path_majors)
+    majors_list = majors['CIPDESC'].tolist()
+
+    def assign_random_major(row):
+        if pd.isnull(row['CIPDESC']):
+            return random.choice(majors_list)
+        else:
+            return row['CIPDESC']
+
+    df['CIPDESC'] = df.apply(assign_random_major, axis=1)
+
+merged_data = pd.read_csv(r"data\merged_data.csv")
+merged_data_filled = add_majors(merged_data)
+output_csv_path_filled = r"data\merged_data_filled.csv"
+merged_data_filled.to_csv(output_csv_path_filled, index=False)

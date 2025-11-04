@@ -3,16 +3,17 @@ import pandas as pd
 # NAMES CLEANING
 csv_path = 'data\college_data_cleaned_100k.csv'
 
-# # Read the CSV file
-inst_name = pd.read_csv(csv_path)
+# Read the CSV file
+data = pd.read_csv(csv_path)
 
-# #Remove duplicates
-inst_name = inst_name.drop_duplicates(subset=['college_name'])
+#Remove duplicates
+data = data.drop_duplicates(subset=['college_name'], keep='first')
 
-# # Save only the institution names to a new CSV file 
-# names = inst_name
-# output_csv_path = 'data\only_names.csv'
-# names.to_csv(output_csv_path, index=False)
+
+# Save only the institution names to a new CSV file 
+newdata = data
+output_csv_path = 'data\college_data.csv'
+newdata.to_csv(output_csv_path, index=False)
 
 
 #MAJORS
