@@ -1,14 +1,63 @@
 import pandas as pd
 
-csv_path = 'data\college_data_cleaned_100k.csv'
+# NAMES
+# csv_path = 'data\college_data_cleaned_100k.csv'
 
-# Read the CSV file
-inst_name = pd.read_csv(csv_path, usecols=['college_name'])
+# # Read the CSV file
+# inst_name = pd.read_csv(csv_path, usecols=['college_name'])
 
-#Remove duplicates
-inst_name = inst_name.drop_duplicates()
+# #Remove duplicates
+# inst_name = inst_name.drop_duplicates()
 
-# Save only the institution names to a new CSV file 
-names = inst_name
-output_csv_path = 'data\only_names.csv'
-names.to_csv(output_csv_path, index=False)
+# # Save only the institution names to a new CSV file 
+# names = inst_name
+# output_csv_path = 'data\only_names.csv'
+# names.to_csv(output_csv_path, index=False)
+
+
+#MAJORS
+# # Cleaning up only bachelor's majors, their cip codes, and institutions
+# csv_path = r"data\Most-Recent-Cohorts-Field-of-Study.csv"
+
+# # Read the CSV file
+# data = pd.read_csv(csv_path, usecols=['INSTNM','CIPCODE', 'CIPDESC', 'CREDDESC'], dtype={'CIPCODE': str})
+
+# filtered_bachelors = data.loc[data['CREDDESC'] == "Bachelor's Degree"]
+
+# # print(filtered_bachelors.head())
+# # Save only the filtered to a new CSV file 
+# output_csv_path = r"data\majors.csv"
+# filtered_bachelors.to_csv(output_csv_path, index=False)
+
+# NAMES 2
+# csv_path = r"data\majors.csv"
+
+# # Read the CSV file
+# inst_name = pd.read_csv(csv_path, usecols=['INSTNM'])
+
+# #Remove duplicates
+# inst_name = inst_name.drop_duplicates()
+
+# # Save only the institution names to a new CSV file 
+# names = inst_name
+# output_csv_path = r"data\only_namesmajorfile.csv"
+# names.to_csv(output_csv_path, index=False)
+
+# Compare differences in institution names between two files
+csv_path1 = r"data\only_names.csv"
+csv_path2 = r"data\only_namesmajorfile.csv"
+
+# Read the CSV files
+names1 = pd.read_csv(csv_path1)
+names2 = pd.read_csv(csv_path2)
+
+# Find names in names2 that are not in names1
+# differences = names1[~names1['college_name'].isin(names2['INSTNM'])] 
+
+# print(differences)
+
+# len
+len1 = len(names1)
+len2 = len(names2)
+print(f"Number of unique institution names in only_names.csv: {len1}")
+print(f"Number of unique institution names in only_namesmajorfile.csv: {len2}")
