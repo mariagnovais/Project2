@@ -34,15 +34,15 @@ void add(std::string filt, int value, std::string college_name){
 
 //get the certain category
 std::map<int, std::vector<std::string>>* get_category(std::string filter){
-auto it = filter.find(filter);
-if (it == filter.end()) {
+auto it = this->filter.find(filter);
+if (it == this->filter.end()) {
 return nullptr;}
 return &(it->second);
 }
 
 //print the whole category
 void print_whole_category(std::string filter){
-auto filt = get_filter(filter);
+auto filt = get_category(filter);
 if (!filt){
 std::cout<<"No filter found"<<std::endl;
 return;
@@ -52,11 +52,12 @@ std::cout<<"Filter: "<< filter <<std::endl;
 
 for (auto&[value, schools] : *filt){
 std::cout<< " " << value <<": ";
-for (int i = 0; i < schools.size(); i++){
+for (int i = 0; i < (int)schools.size(); i++){
 std::cout<<schools[i];
-if (i+1 < schools.size()){
+if (i+1 < (int)schools.size()){
 std::cout<< "< ";}
 }
+std::cout<<std::endl;
 }
 std::cout<<std::endl;
 }
@@ -64,12 +65,12 @@ std::cout<<std::endl;
 //this gets the top n colleges of the hashmap which is already ordered
 std::vector<std::string> top_n_colleges(std::string filter, int n){
 std::vector<std::string> output;
-auto filt = get_filter(filter);
+auto filt = get_category(filter);
 if (!filt){
 return output;}
 
 for (auto it = filt->rbegin(); it != filt->rend(); ++it){
-std::vector<std::string>& schools = it->second;
+const std::vector<std::string>& schools = it->second;
 for (int i = 0; i < (int)schools.size(); i++){
 output.push_back(schools[i]);
 if ((int)output.size() == n){
@@ -83,12 +84,12 @@ return output;
 //and this gets the bottom n colleges
 std::vector<std::string> bottom_n_colleges(std::string filter, int n){
 std::vector<std::string> output;
-auto filt = get_filter(filter);
+auto filt = get_category(filter);
 if (!filt){
 return output;}
 
 for (auto it = filt->begin(); it != filt->end(); ++it){
-std::vector<std::string>& schools = it->second;
+const std::vector<std::string>& schools = it->second;
 for (int i = 0; i < (int)schools.size(); i++){
 output.push_back(schools[i]);
 if ((int)output.size() == n){
@@ -102,7 +103,7 @@ return output;
 //load from csv file
 
 bool load_file(std::string& path, bool has_header = true) {
-std::ifstream file(path.c_str();
+std::ifstream file(path.c_str());
 if (!file.is_open()) {
 std::cout<<"Failed to open file "<<path<<std::endl;
 return false;}
@@ -110,11 +111,12 @@ std::string line;
 if (has_header) {
 if (!std::getline(file,line)) {
 std::cout<<"Failed to read header from file "<<path<<std::endl;}
+return false;
 }
 
 while (std::getline(file,line)) {
 std::vector<std::string> cols;
-split_csv_line(line,schools);
+file_split_line(line,cols);
 if ((int)cols.size()<8){ //expected 8 colums
 continue;}
 std::string college_name = cols[0];
@@ -125,9 +127,9 @@ int tuition = parse_int_safe(cols[7],-1);
 if (sat >= 0){
 add("SAT scores",sat,college_name);}
 if (size >= 0){
-add("School size",size,college_name);}
+add("school size",size,college_name);}
 if (tuition >= 0){
-add("Tuition",tuition,college_name);}
+add("tuition",tuition,college_name);}
 }
 return true;
 }
