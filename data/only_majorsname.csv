@@ -1,13 +1,13 @@
 CIPCODE,CIPDESC
-100,"Agriculture, General"
-101,Agricultural Business and Management
-109,Animal Sciences
-110,Food Science and Technology
-111,Plant Sciences
-199,"Agriculture, Agriculture Operations, and Related Sciences, Other"
-305,Forestry
-403,"City/Urban, Community and Regional Planning"
-502,"Ethnic, Cultural Minority, Gender, and Group Studies"
+0100,"Agriculture, General"
+0101,Agricultural Business and Management
+0109,Animal Sciences
+0110,Food Science and Technology
+0111,Plant Sciences
+0199,"Agriculture, Agriculture Operations, and Related Sciences, Other"
+0305,Forestry
+0403,"City/Urban, Community and Regional Planning"
+0502,"Ethnic, Cultural Minority, Gender, and Group Studies"
 1002,Audiovisual Communications Technologies/Technicians
 1101,"Computer and Information Sciences, General"
 1310,Special Education and Teaching
