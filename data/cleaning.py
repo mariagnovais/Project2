@@ -1,5 +1,14 @@
 import pandas as pd
 
+# ISSUES TO WORK ON FLIGHT:
+# ----------------------------------------------------------------------------------------------------------
+# IN MAJORS.CSV TAKE OUT BACHELOR'S DEGREE COLUMN
+# IN ONLY MAJORSNAME.CSV, PUT THE LEADING ZEROS FROM CIPCODE
+# CREATE A SCRIPT TO ADD MAJORS TO COLLEGES THAT DONT HAVE ONE
+# RE-SEE NORMALIZE NAMES IN MERGING.PY
+# START FRONT END
+
+
 # NAMES CLEANING
 # csv_path = 'data\college_data_cleaned_100k.csv'
 
