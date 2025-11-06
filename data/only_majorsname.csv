@@ -40,7 +40,7 @@ CIPCODE,CIPDESC
 5207,Entrepreneurial and Small Business Operations
 5208,Finance and Financial Management Services
 5214,Marketing
-901,Communication and Media Studies
+0901,Communication and Media Studies
 1401,"Engineering, General"
 1405,Biomedical/Medical Engineering
 1418,Materials Engineering
@@ -86,11 +86,11 @@ CIPCODE,CIPDESC
 3103,"Parks, Recreation and Leisure Facilities Management"
 5003,Dance
 5123,Rehabilitation and Therapeutic Professions
-301,Natural Resources Conservation and Research
-501,Area Studies
-904,Journalism
-907,"Radio, Television, and Digital Communication"
-909,"Public Relations, Advertising, and Applied Communication"
+0301,Natural Resources Conservation and Research
+0501,Area Studies
+0904,Journalism
+0907,"Radio, Television, and Digital Communication"
+0909,"Public Relations, Advertising, and Applied Communication"
 1306,"Educational Assessment, Evaluation, and Research"
 1404,Architectural Engineering
 1414,Environmental/Environmental Health Engineering
@@ -123,13 +123,13 @@ CIPCODE,CIPDESC
 4506,Economics
 5201,"Business/Commerce, General"
 5211,International Business
-103,Agricultural Production Operations
-108,Agricultural Public Services
-302,Natural Resources Management and Policy
-306,Wildlife and Wildlands Science and Management
-402,Architecture
-404,Environmental Design
-405,Interior Architecture
+0103,Agricultural Production Operations
+0108,Agricultural Public Services
+0302,Natural Resources Management and Policy
+0306,Wildlife and Wildlands Science and Management
+0402,Architecture
+0404,Environmental Design
+0405,Interior Architecture
 1432,Polymer/Plastics Engineering
 1445,Biological/Biosystems Engineering
 1999,"Family and Consumer Sciences/Human Sciences, Other"
@@ -141,11 +141,11 @@ CIPCODE,CIPDESC
 3019,Nutrition Sciences
 4404,Public Administration
 4901,Air Transportation
-499,"Architecture and Related Services, Other"
+0499,"Architecture and Related Services, Other"
 3020,International/Global Studies
 2203,Legal Support Services
-113,Agriculture/Veterinary Preparatory Programs
-181,Veterinary Biomedical and Clinical Sciences
+0113,Agriculture/Veterinary Preparatory Programs
+0181,Veterinary Biomedical and Clinical Sciences
 2602,"Biochemistry, Biophysics and Molecular Biology"
 3903,Missions/Missionary Studies and Missiology
 3906,Theological and Ministerial Studies
@@ -160,11 +160,11 @@ CIPCODE,CIPDESC
 1599,"Engineering Technologies/Technicians, Other"
 3101,"Parks, Recreation and Leisure Studies"
 4499,"Public Administration and Social Service Professions, Other"
-105,Agricultural and Domestic Animal Services
+0105,Agricultural and Domestic Animal Services
 1500,"Engineering Technology, General"
 3001,Biological and Physical Sciences
 4399,"Homeland Security, Law Enforcement, Firefighting and Related Protective Services, Other"
-999,"Communication, Journalism, and Related Programs, Other"
+0999,"Communication, Journalism, and Related Programs, Other"
 1109,Computer Systems Networking and Telecommunications
 5001,"Visual and Performing Arts, General"
 3023,Intercultural/Multicultural and Diversity Studies
@@ -194,8 +194,8 @@ CIPCODE,CIPDESC
 1511,Engineering-Related Technologies
 1616,American Sign Language
 3015,"Science, Technology and Society"
-112,Soil Sciences
-409,Architectural Sciences and Technology
+0112,Soil Sciences
+0409,Architectural Sciences and Technology
 4604,"Building/Construction Finishing, Management, and Inspection"
 5220,Construction Management
 1299,"Personal and Culinary Services, Other"
@@ -203,8 +203,8 @@ CIPCODE,CIPDESC
 4199,"Science Technologies/Technicians, Other"
 5106,Dental Support Services and Allied Professions
 5108,Allied Health and Medical Assisting Services
-303,Fishing and Fisheries Sciences and Management
-399,"Natural Resources and Conservation, Other"
+0303,Fishing and Fisheries Sciences and Management
+0399,"Natural Resources and Conservation, Other"
 1421,Mining and Mineral Engineering
 1425,Petroleum Engineering
 1439,Geological/Geophysical Engineering
@@ -214,7 +214,7 @@ CIPCODE,CIPDESC
 4402,Community Organization and Advocacy
 5006,Film/Video and Photographic Arts
 3106,Outdoor Education
-406,Landscape Architecture
+0406,Landscape Architecture
 1003,Graphic Communications
 1105,Computer Systems Analysis
 1413,Engineering Science
@@ -249,7 +249,7 @@ CIPCODE,CIPDESC
 3999,"Theology and Religious Vocations, Other"
 1442,"Mechatronics, Robotics, and Automation Engineering"
 5118,Ophthalmic and Optometric Support Services and Allied Professions
-106,Applied Horticulture and Horticultural Business Services
+0106,Applied Horticulture and Horticultural Business Services
 1103,Data Processing
 5217,Insurance
 1001,Communications Technology/Technician
@@ -265,12 +265,12 @@ CIPCODE,CIPDESC
 4807,Woodworking
 5002,"Crafts/Craft Design, Folk Art and Artisanry"
 1403,Agricultural Engineering
-102,Agricultural Mechanization
+0102,Agricultural Mechanization
 3032,Marine Sciences
 3025,Cognitive Science
 3016,Accounting and Computer Science
 5215,Real Estate
-183,Veterinary/Animal Health Technologies/Technicians
+0183,Veterinary/Animal Health Technologies/Technicians
 2603,Botany/Plant Biology
 3008,Mathematics and Computer Science
 2399,"English Language and Literature/Letters, Other"
@@ -280,9 +280,9 @@ CIPCODE,CIPDESC
 1423,Nuclear Engineering
 1613,"Celtic Languages, Literatures, and Linguistics"
 3022,Classical and Ancient Studies
-107,International Agriculture
+0107,International Agriculture
 1309,Social and Philosophical Foundations of Education
-410,Real Estate Development
+0410,Real Estate Development
 3013,Medieval and Renaissance Studies
 4503,Archeology
 4903,Marine Transportation
@@ -290,13 +290,13 @@ CIPCODE,CIPDESC
 1203,Funeral Service and Mortuary Science
 5221,Telecommunications Management
 5132,Bioethics/Medical Ethics
-910,Publishing
+0910,Publishing
 4513,Sociology and Anthropology
 4101,Biology Technician/Biotechnology Laboratory Technician
 3041,Environmental Geosciences
 4505,Demography and Population Studies
 3047,Linguistics and Anthropology
-408,Architectural History and Criticism
+0408,Architectural History and Criticism
 3401,Health-Related Knowledge and Skills
 1307,International and Comparative Education
 2799,"Mathematics and Statistics, Other"
@@ -320,7 +320,7 @@ CIPCODE,CIPDESC
 5105,Advanced/Graduate Dentistry and Oral Sciences
 1424,Ocean Engineering
 1438,Surveying Engineering
-104,Agricultural and Food Products Processing
+0104,Agricultural and Food Products Processing
 3044,Geography and Environmental Studies
 5116,Nursing
 1517,Energy Systems Technologies/Technicians
@@ -347,7 +347,7 @@ CIPCODE,CIPDESC
 3039,Economics and Computer Science
 4011,Physics and Astronomy
 2803,"Army ROTC, Military Science and Operations"
-180,Veterinary Medicine
+0180,Veterinary Medicine
 1509,Mining and Petroleum Technologies/Technicians
 3201,Basic Skills and Developmental/Remedial Education
 3029,Maritime Studies
@@ -360,7 +360,7 @@ CIPCODE,CIPDESC
 3301,Citizenship Activities
 1441,Electromechanical Engineering
 5216,Taxation
-599,"Area, Ethnic, Cultural, and Gender Studies, Other"
+0599,"Area, Ethnic, Cultural, and Gender Studies, Other"
 1606,Modern Greek Language and Literature
 4102,Nuclear and Industrial Radiologic Technologies/Technicians
 5135,Somatic Bodywork and Related Therapeutic Services
@@ -375,7 +375,7 @@ CIPCODE,CIPDESC
 3049,Mathematical Economics
 4799,"Mechanic and Repair Technologies/Technicians, Other"
 4103,Physical Science Technologies/Technicians
-182,Veterinary Administrative Services
+0182,Veterinary Administrative Services
 4699,"Construction Trades, Other"
 1516,Nanotechnology
 2805,Military Science and Operational Studies
