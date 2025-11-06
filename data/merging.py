@@ -47,33 +47,40 @@ def merging_datasets():
 
 
 # creating random data for colleges that don't have majors
-def add_majors(df : pd.DataFrame) -> pd.DataFrame:
+def add_majors():
 
+    # paths
     merged_path = r"data\merged_data.csv"
-    merged = pd.read_csv(merged_path)
     csv_path_majors = r"data\only_majorsname.csv"
+    output_path = r"data\merged_data_100k.csv"
+
+    # load data
+    merged = pd.read_csv(merged_path)
     majors = pd.read_csv(csv_path_majors)
-    majors_list = majors['CIPDESC'].tolist()
-    missing = merged['CIPDESC'].isna().sum()
-    print(f"Number of missing majors before filling: {missing}")
-    def assign_random_major(row):
-        if pd.isnull(row['CIPDESC']):
-            return random.choice(majors_list)
-        else:
-            return row['CIPDESC']
+    majors_list = majors['CIPDESC'].dropna().astype(str).tolist()
 
-    df['CIPDESC'] = df.apply(assign_random_major, axis=1)
-    return df
+    # separate missing and not missing
+    with_majors = merged[merged['CIPDESC'].notna()].copy()
+    without_majors = merged[merged['CIPDESC'].isna()].copy()
 
-# merged_data = pd.read_csv(r"data\merged_data.csv")
-# mergedFill= add_majors(merged_data)
-# output_csv_path_filled = r"data\merged_data_filled.csv"
-# mergedFill.to_csv(output_csv_path_filled, index=False)
+    expanded_rows = []
 
-merged_path = r"data\merged_data.csv"
-merged = pd.read_csv(merged_path)
-csv_path_majors = r"data\only_majorsname.csv"
-majors = pd.read_csv(csv_path_majors)
-majors_list = majors['CIPDESC'].tolist()
-missing = merged[merged['CIPDESC'].isna()]
-print(f"Number of missing majors before filling: {missing}")
+    # for each college without majors, create 13 rows with random majors
+    for idx, row in without_majors.iterrows():
+        for _ in range(13):
+            new_row = row.copy()
+            new_row['CIPDESC'] = random.choice(majors_list)
+            expanded_rows.append(new_row)
+
+    # combine all
+    expanded_df = pd.DataFrame(expanded_rows)
+    final = pd.concat([with_majors, expanded_df], ignore_index=True)
+
+    # remove rows without majors
+    final = final.dropna(subset=['CIPDESC']).reset_index(drop=True)
+
+    # save the final 
+    final.to_csv(output_path, index=False)
+    return final
+
+final_df = add_majors()
