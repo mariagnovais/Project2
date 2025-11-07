@@ -134,14 +134,19 @@ public:
             return false;
         }
         std::string line;
+		std::vector<std::string> header_colums;
         if (has_header)
         {
             if (!std::getline(file, line))
             {
                 std::cout << "Failed to read header from file " << path << std::endl;
+				return false;
             }
-            return false;
+            file_split_line(line, header_colums);
         }
+		else{
+			header_colums.clear();
+		}
 
         while (std::getline(file, line))
         {
@@ -151,23 +156,28 @@ public:
             { // expected 8 colums
                 continue;
             }
-            std::string college_name = cols[0];
-            int sat = parse_int_safe(cols[1], -1);
-            int size = parse_int_safe(cols[6], -1);
-            int tuition = parse_int_safe(cols[7], -1);
+        	std::string college_name = cols[0];
 
-            if (sat >= 0)
-            {
-                add("SAT scores", sat, college_name);
-            }
-            if (size >= 0)
-            {
-                add("school size", size, college_name);
-            }
-            if (tuition >= 0)
-            {
-                add("tuition", tuition, college_name);
-            }
+			for (int i = 1 ; i <=7; i++){//skip index 0 that is the name of the college
+					std::string categ;
+					if (has_header && i < (int)header_colums.size()){
+						categ = header_to_category(header_colums[i]);
+						}
+					else{
+						categ = "col_" + std::to_string(i);
+						}
+					int int_value = parse_int_safe(cols[i], -1); //-1 bc there is no negative values, it's kind of a gate keeper
+					if (int_value != -1) {
+						add(categ, int_value, college_name);
+						continue;
+						}
+					float float_value; //this step is basically made just for college admission
+					bool check_float = parse_float_safe(cols[i], float_value);
+					if (check_float) {
+						int scaled = (int)(float_value * 10000.0f);
+						add(categ, scaled, college_name);
+					}
+			}
         }
         return true;
     }
@@ -206,7 +216,6 @@ private:
             return fallback;
         }
         std::string t = s.substr(i, j - i + 1);
-
         try
         {
             return std::stoi(t);
@@ -216,6 +225,34 @@ private:
             return fallback;
         }
     }
+	static bool parse_float_safe(const std::string &s, float& out){
+		int i = 0;
+		while (i < (int)s.size() && (s[i] == ' ' || s[i] == '\t'))
+            i++;
+        int j = (int)s.size() - 1;
+        while (j >= 0 && (s[j] == ' ' || s[j] == '\t'))
+            j--;
+		if (i > j) return false;
+
+		std::string t = s.substr(i, j - i + 1);
+		try
+        {
+			out = std::stof(t);
+            return true;
+        }
+        catch (...)
+        {
+            return false;
+        }
+	}
+
+	static std::string header_to_category(const std::string& header){
+		if (header == "sat_score") return "SAT scores";
+		if (header == "undergrad_enrollment") return "school size";
+		if (header == "tuition") return "tuition";
+		if (header == "admission_rate") return "admission rate";
+		return header;
+	}
 };
 
 #endif // PROJECT2_HASHMAP_OF_HASHMAPS_H
