@@ -1,12 +1,9 @@
 from typing import Optional, List, Tuple
 import tkinter as tk
 from tkinter import ttk, messagebox
-import subprocess, sys, os
+import subprocess, sys
 from pathlib import Path
 
-
-# Additionally, the max-heap data computes a weighted score for each college based on user-selected importance of tuition, 
-# acceptance rate, SAT scores, and undergraduate population, ranking colleges according to this personalized scoring system.
 def make_label(parent: tk.Widget, text: str, **grid_kwargs: int) -> tk.Label:
     label = tk.Label(parent, text=text, anchor="w", font=("Courier New", 16), fg="#1d2c79", bg="white")
     label.grid(sticky="ew", pady=(8, 2), **grid_kwargs)
@@ -40,52 +37,56 @@ def parse_matches(output : str) -> List[Tuple[str, float]]:
             rows.append((line, 0.0))
     return rows
 
-class ResultsFrame(ttk.Frame):
-    def __init__(self, master: tk.Misc, on_back, results: List[Tuple[str, float]]) -> None:
+class WelcomeFrame(ttk.Frame):
+    def __init__(self, master: tk.Misc, on_start, on_exit) -> None:
         super().__init__(master, padding=32)
         self.configure(style="Card.TFrame")
-        self.results = results
-        self.on_back = on_back
 
-        title = tk.Label(self, text="Match Results", font=("Courier New", 28, "bold"), fg="#1d2c79", bg="white")
-        title.grid(row=0, column=0, sticky="w", pady=(0, 16))
+        title = tk.Label(self, text="College Matcher", font=("Courier New", 36, "bold"), fg="#1936a3", bg="white")
+        title.grid(row=0, column=0, pady=(0, 20))
 
-        self.tree = ttk.Treeview(self, columns=("college", "score"), show="headings", height=14)
-        self.tree.heading("college", text="College")
-        self.tree.heading("score", text="Score")
-        self.tree.column("college", width=540, anchor="w")
-        self.tree.column("score", width=120, anchor="center")
+        emoji = tk.Label(self, text="🎓", font=("Arial", 48), bg="white")
+        emoji.grid(row=0, column=1, padx=(16, 0), sticky="w")
 
-        scroll = ttk.Scrollbar(self, orient="vertical", command=self.tree.yview)
-        self.tree.configure(yscrollcommand=scroll.set)
-        self.tree.grid(row=1, column=0, sticky="nsew")
-        scroll.grid(row=1, column=1, sticky="ns")
+        start_button = tk.Button(
+            self,
+            text="Start Matching",
+            command=on_start,
+            bg="#1936a3",
+            fg="white",
+            font=("Courier New", 18, "bold"),
+            activebackground="#0f1f5c",
+            relief="flat",
+            padx=40,
+            pady=16,
+        )
+        start_button.grid(row=1, column=0, columnspan=2, pady=(40, 16))
 
-        btns = ttk.Frame(self, style="Card.TFrame")
-        btns.grid(row=2, column=0, columnspan=2, pady=(12, 0), sticky="e")
-        ttk.Button(btns, text="Back", command=self.on_back, style="Accent.TButton").grid(row=0, column=0, padx=6)
-        ttk.Button(btns, text="Exit", command=self.quit_app, style="Accent.TButton").grid(row=0, column=2, padx=6)
+        exit_button = tk.Button(
+            self,
+            text="Exit",
+            command=on_exit,
+            bg="#1936a3",
+            fg="white",
+            font=("Courier New", 18, "bold"),
+            activebackground="#0f1f5c",
+            relief="flat",
+            padx=40,
+            pady=16,
+        )
+        exit_button.grid(row=2, column=0, columnspan=2, pady=(0, 10))
 
-        self.columnconfigure(0, weight=1)
-        self.rowconfigure(1, weight=1)
+        for column in range(2):
+            self.columnconfigure(column, weight=1)
 
-        self.load_rows()
-
-    def load_rows(self) -> None:
-        rows = sorted(self.results, key=lambda x: x[1], reverse=True)
-        for name, score in rows:
-            score_disp = f"{score*100:.1f}%" if score else ""
-            self.tree.insert("", "end", values=(name, score_disp))
-
-    def quit_app(self) -> None:
-        self.winfo_toplevel().destroy()
+        start_button.focus_set()
 
 class FormFrame(ttk.Frame):
-    def __init__(self, master: tk.Misc, on_back, on_results) -> None:
+    def __init__(self, master: tk.Misc, on_back, on_next) -> None:
         super().__init__(master, padding=32)
         self.configure(style="Card.TFrame")
         self.on_back = on_back
-        self.on_results = on_results
+        self.on_next = on_next
 
         title = tk.Label(self, text="Enter your preferences:", font=("Courier New", 28, "bold"), fg="#1d2c79", bg="white")
         title.grid(row=0, column=0, columnspan=2, sticky="w", pady=(0, 20))
@@ -169,25 +170,150 @@ class FormFrame(ttk.Frame):
         button_frame.grid(row=15, column=0, columnspan=2, pady=(16, 0), sticky="e")
 
         ttk.Button(button_frame, text="Back", command=self.on_back, style="Accent.TButton").grid(row=0, column=0, padx=6)
-        ttk.Button(button_frame, text="Start Matching", command=self.run_matcher, style="Accent.TButton").grid(row=0, column=1, padx=6)
+        ttk.Button(button_frame, text="Next: Set Weights", command=self.submit_form, style="Accent.TButton").grid(row=0, column=1, padx=6)
 
         for column in range(2):
             self.columnconfigure(column, weight=1)
 
         name_entry.focus_set()
+    
+    def submit_form(self) -> None:
+        # Validate SAT score
+        sat_value = self.sat_var.get().strip()
+        if sat_value and not sat_value.isdigit():
+            messagebox.showerror("Invalid SAT", "Please enter a number (e.g., 1400)")
+            return
+        
+        form_data = {
+            "name": self.name_var.get().strip(),
+            "sat": sat_value,
+            "state": self.state_var.get().strip(),
+            "control": self.control_var.get().strip(),
+            "size": self.size_var.get().strip(),
+            "tuition": self.tuition_var.get().strip(),
+            "acceptance": self.acceptance_var.get().strip(),
+        }
+
+        self.on_next(form_data)
+
+
+class WeightsFrame(ttk.Frame):
+    def __init__(self, master: tk.Misc, on_back, on_results, form_data: dict) -> None:
+        super().__init__(master, padding=32)
+        self.configure(style="Card.TFrame")
+        self.on_back = on_back
+        self.on_results = on_results
+        self.form_data = form_data # Store data from previous screen
+
+        title = tk.Label(self, text="Set Importance Weights", font=("Courier New", 28, "bold"), fg="#1d2c79", bg="white")
+        title.grid(row=0, column=0, columnspan=2, sticky="w", pady=(0, 20))
+
+        # Variables for weights
+        self.tuition_weight_var = tk.DoubleVar(value=1.0)
+        self.acceptance_weight_var = tk.DoubleVar(value=1.0)
+        self.sat_weight_var = tk.DoubleVar(value=1.0)
+        self.size_weight_var = tk.DoubleVar(value=1.0)
+
+        # Helper function for creating a slider
+        def create_slider(parent, text, variable, row):
+            make_label(parent, text, row=row, column=0)
+            # Display current value
+            value_label = tk.Label(parent, textvariable=variable, font=("Courier New", 16, "bold"), fg="#1936a3", bg="white")
+            value_label.grid(row=row, column=1, sticky="e", padx=(10,0))
+            # Slider
+            slider = ttk.Scale(
+                parent,
+                from_=0.0,
+                to=5.0,
+                orient="horizontal",
+                variable=variable,
+                command=lambda v: variable.set(round(float(v), 1)) # Round to 1 decimal
+            )
+            slider.grid(row=row+1, column=0, columnspan=2, sticky="ew", pady=(0, 20))
+
+        # Create sliders
+        create_slider(self, "Tuition Importance:", self.tuition_weight_var, 1)
+        create_slider(self, "Acceptance Rate Importance:", self.acceptance_weight_var, 3)
+        create_slider(self, "SAT Score Importance:", self.sat_weight_var, 5)
+        create_slider(self, "Campus Size Importance:", self.size_weight_var, 7)
+        
+        # Add radio buttons for algorithm choice
+        make_label(self, "Algorithm:", row=8, column=0)
+        self.algo_var = tk.StringVar(value="hashmap")
+
+        algo_frame = ttk.Frame(self, style="Card.TFrame")
+        algo_frame.grid(row=9, column=0, columnspan=2, sticky="w", pady=(0, 20))
+
+        ttk.Radiobutton(
+            algo_frame,
+            text = "Hashmap",
+            variable=self.algo_var,
+            value="hashmap",
+            style="TRadiobutton"
+        ).pack(side = "left", padx=20)
+
+        ttk.Radiobutton(
+            algo_frame,
+            text = "Heap",
+            variable=self.algo_var,
+            value="heap",
+            style="TRadiobutton"
+        ).pack(side = "left", padx=20)
+
+        # Buttons
+        button_frame = ttk.Frame(self, style="Card.TFrame")
+        button_frame.grid(row=8, column=0, columnspan=2, pady=(16, 0), sticky="e")
+
+        ttk.Button(button_frame, text="Back", command=self.on_back, style="Accent.TButton").grid(row=0, column=0, padx=6)
+        ttk.Button(button_frame, text="Run Match", command=self.run_matcher, style="Accent.TButton").grid(row=0, column=1, padx=6)
+
+        self.columnconfigure(0, weight=1)
 
     def run_matcher(self) -> None:
-        args = [
-            self.name_var.get().strip(),
-            self.sat_var.get().strip(),
-            self.state_var.get().strip(),
-            self.control_var.get().strip(),
-            self.size_var.get().strip(),
-            self.tuition_var.get().strip(),
-            self.acceptance_var.get().strip(),
-        ]
+        sat_value = self.form_data.get("sat", "")
+        state_str = self.form_data.get("state", "Any")
+        control_str = self.form_data.get("control", "Any")
+        tuition_str = self.form_data.get("tuition", "Any")
+        acceptance_str = self.form_data.get("acceptance", "Any")
+        size_str = self.form_data.get("size", "Any")
 
+        tuition_map = {
+            "Any": 0,
+            "<$20k": 20000,
+            "$20k-$40k": 40000,
+            "$40k-$60k": 60000,
+            ">$60k": 150000,
+        }
+
+        acceptance_map = {
+            "Any": 0.0,
+            "<20%" : 0.01, 
+            "20%-50%": 0.2, 
+            "50%-80%": 0.5, 
+            ">80%" : 0.8,
+        }
         
+        size_map = {
+            "Any": 0, 
+            "Small": 500, 
+            "Medium": 15000, 
+            "Large": 50000,
+        }
+
+        state = "" if state_str == "Any" else state_str
+        control = "" if control_str == "Any" else control_str
+        tuition = tuition_map.get(tuition_str, 0)
+        acceptance_rate = acceptance_map.get(acceptance_str, 0)
+        school_size = size_map.get(size_str, 0)
+        sat_score = sat_value
+
+        weight_tuition = str(self.tuition_weight_var.get())
+        weight_acceptance = str(self.acceptance_weight_var.get())
+        weight_sat = str(self.sat_weight_var.get())
+        weight_size = str(self.size_weight_var.get())
+
+        algorithm_choice = self.algo_var.get()
+
         project_root = Path(__file__).resolve().parents[2]
         exe_locs = [project_root / ("build/Project2.exe" if sys.platform == "win32" else "build/Project2"),
                     project_root / ("Project2.exe" if sys.platform == "win32" else "Project2")
@@ -195,51 +321,6 @@ class FormFrame(ttk.Frame):
         
         exe = next((exec for exec in exe_locs if exec.exists()), exe_locs[0])
         csv_path = project_root / "data" / "merged_data_100k.csv"
-
-        sat_value = self.sat_var.get().strip()
-        if sat_value and not sat_value.isdigit():
-            messagebox.showerror("Invalid SAT", "Please enter a number")
-            return
-        
-        tuition_map = {
-            "Any": 0,
-            "<$20k": 20000,
-            "$20k–$40k": 40000,
-            "$40k–$60k": 60000,
-            ">$60k": 150000,
-        }
-
-        acceptance_map = {
-            "Any": 0,
-            "<20%" : 0.0, 
-            "20%–50%": 0.2, 
-            "50%–80%": 0.5, 
-            ">80%" : 0.8,
-        }
-        
-        size_map = {
-            "Any": 0, 
-            "Small": 500, 
-            "Medium": 5000, 
-            "Large": 15000,
-        }
-
-        state = "" if self.state_var.get() == "Any" else self.state_var.get()
-
-        control = "" if self.control_var.get() == "Any" else self.control_var.get()
-
-        tuition = tuition_map.get(self.tuition_var.get(), 0)
-
-        acceptance_rate = acceptance_map.get(self.acceptance_var.get(), 0)
-
-        school_size = size_map.get(self.size_var.get(), 0)
-
-        sat_score = sat_value
-
-        weight_tuition = "2.0" if tuition else "1.0"
-        weight_acceptance = "2.0" if acceptance_rate else "1.0"
-        weight_sat = "2.0" if sat_score else "1.0"
-        weight_size = "2.0" if school_size != 0 else "1.0"
 
         args = [
             str(csv_path),
@@ -253,20 +334,11 @@ class FormFrame(ttk.Frame):
             str(weight_acceptance),
             str(weight_sat),
             str(weight_size),
+            str(algorithm_choice),
         ]
 
         result: Optional[subprocess.CompletedProcess[str]] = None
 
-        if not os.path.exists(exe):
-            mock = [
-                ("University of Florida", 0.93),
-                ("Duke University", 0.89),
-                ("Northwestern University", 0.87),
-                ("University of Illinois Urbana-Champaign", 0.82),
-            ]
-            self.on_results(mock)
-            return
-        
         print("DEBUG")
         print(f"Running command: {[str(exe)] + args}")
         try:
@@ -290,65 +362,55 @@ class FormFrame(ttk.Frame):
             return
 
         output = (result.stdout or "").strip() or "No output from matcher."
-        print("Algorithm Output:\\n" + output)
-        messagebox.showinfo("Match Results: ", output)
-            
-    def print_summary(self) -> None:
-        summary = (
-            f"Name: {self.name_var.get()}\n"
-            f"SAT Score: {self.sat_var.get()}\n"
-            f"State: {self.state_var.get()}\n"
-            f"Control: {self.control_var.get()}\n"
-            f"Campus Size: {self.size_var.get()}\n"
-            f"Tuition: {self.tuition_var.get()}\n"
-            f"Acceptance Rate: {self.acceptance_var.get()}"
-        )
-        print("Preferences captured:\n" + summary)
+        
+        parsed_results = parse_matches(output)
+        self.on_results(parsed_results)
+        
 
+        
+    
 
-class WelcomeFrame(ttk.Frame):
-    def __init__(self, master: tk.Misc, on_start, on_exit) -> None:
-        super().__init__(master, padding=32)
+class ResultsFrame(ttk.Frame):
+    def __init__(self, master: tk.Misc, on_back, results: List[Tuple[str, float]]) -> None:
+        super().__init__(master, padding=24)
         self.configure(style="Card.TFrame")
+        self.results = results
+        self.on_back = on_back
 
-        title = tk.Label(self, text="College Matcher", font=("Courier New", 36, "bold"), fg="#1936a3", bg="white")
-        title.grid(row=0, column=0, pady=(0, 20))
+        title = tk.Label(self, text="Match Results", font=("Courier New", 28, "bold"), fg="#1d2c79", bg="white")
+        title.grid(row=0, column=0, sticky="w", pady=(0, 16))
 
-        emoji = tk.Label(self, text="🎓", font=("Arial", 48), bg="white")
-        emoji.grid(row=0, column=1, padx=(16, 0), sticky="w")
+        self.tree = ttk.Treeview(self, columns=("college", "score"), show="headings", height=14)
+        self.tree.heading("college", text="College")
+        self.tree.heading("score", text="Score")
+        self.tree.column("college", width=540, anchor="w")
+        self.tree.column("score", width=120, anchor="center")
 
-        start_button = tk.Button(
-            self,
-            text="Start Matching",
-            command=on_start,
-            bg="#1936a3",
-            fg="white",
-            font=("Courier New", 18, "bold"),
-            activebackground="#0f1f5c",
-            relief="flat",
-            padx=40,
-            pady=16,
-        )
-        start_button.grid(row=1, column=0, columnspan=2, pady=(40, 16))
+        scroll = ttk.Scrollbar(self, orient="vertical", command=self.tree.yview)
+        self.tree.configure(yscrollcommand=scroll.set)
+        self.tree.grid(row=1, column=0, sticky="nsew")
+        scroll.grid(row=1, column=1, sticky="ns")
 
-        exit_button = tk.Button(
-            self,
-            text="Exit",
-            command=on_exit,
-            bg="#1936a3",
-            fg="white",
-            font=("Courier New", 18, "bold"),
-            activebackground="#0f1f5c",
-            relief="flat",
-            padx=40,
-            pady=16,
-        )
-        exit_button.grid(row=2, column=0, columnspan=2, pady=(0, 10))
+        btns = ttk.Frame(self, style="Card.TFrame")
+        btns.grid(row=2, column=0, columnspan=2, pady=(12, 0), sticky="e")
+        ttk.Button(btns, text="Back", command=self.on_back, style="Accent.TButton").grid(row=0, column=0, padx=6)
+        ttk.Button(btns, text="Exit", command=self.quit_app, style="Accent.TButton").grid(row=0, column=2, padx=6)
 
-        for column in range(2):
-            self.columnconfigure(column, weight=1)
+        self.columnconfigure(0, weight=1)
+        self.rowconfigure(1, weight=1)
 
-        start_button.focus_set()
+        self.load_rows()
+
+    def load_rows(self) -> None:
+        rows = sorted(self.results, key=lambda x: x[1], reverse=True)
+        for name, score in rows:
+            score_disp = f"{score*100:.1f}%" if score else ""
+            self.tree.insert("", "end", values=(name, score_disp))
+
+    def quit_app(self) -> None:
+        self.winfo_toplevel().destroy()
+
+
 
 
 class CollegeMatcherApp(tk.Tk):
@@ -362,21 +424,30 @@ class CollegeMatcherApp(tk.Tk):
         style = ttk.Style(self)
         style.configure("Card.TFrame", background="white")
         style.configure("Accent.TButton", font=("Courier New", 16, "bold"), padding=10)
+        style.configure("Horizontal.TScale", background = "white")
+        style.configure("TRadiobutton", background = "white")
 
         self.card = ttk.Frame(self, style="Card.TFrame", padding=24)
         self.card.place(relx=0.5, rely=0.5, anchor="center")
 
         self.current_frame: Optional[ttk.Frame] = None
+        self.form_data: dict = {}
+
         self.show_welcome()
 
     def show_welcome(self) -> None:
         self.swap_frame(WelcomeFrame(self.card, self.show_form, self.destroy))
 
     def show_form(self) -> None:
-        self.swap_frame(FormFrame(self.card, self.show_welcome, self.show_results))
+        self.swap_frame(FormFrame(self.card, self.show_welcome, self.show_weights))
+
+    def show_weights(self, form_data: dict) -> None:
+        self.form_data = form_data
+        self.swap_frame(WeightsFrame(self.card, self.show_form, self.show_results, form_data))
 
     def show_results(self, results):
-        self.swap_frame(ResultsFrame(self.card, self.show_form, results))
+        on_back_weights = lambda: self.show_weights(self.form_data)
+        self.swap_frame(ResultsFrame(self.card, on_back_weights, results))
 
     def swap_frame(self, frame: ttk.Frame) -> None:
         if self.current_frame is not None:
