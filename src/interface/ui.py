@@ -4,6 +4,7 @@ from tkinter import ttk
 from tkinter import messagebox
 import subprocess
 import sys
+from pathlib import Path
 
 def make_label(parent: tk.Widget, text: str, **grid_kwargs: int) -> tk.Label:
     label = tk.Label(parent, text=text, anchor="w", font=("Courier New", 16), fg="#1d2c79", bg="white")
@@ -110,7 +111,7 @@ class FormFrame(ttk.Frame):
         button_frame.grid(row=15, column=0, columnspan=2, pady=(16, 0), sticky="e")
 
         ttk.Button(button_frame, text="Back", command=self.on_back, style="Accent.TButton").grid(row=0, column=0, padx=6)
-        ttk.Button(button_frame, text="Start Matching", command=self.run_matcher(), style="Accent.TButton").grid(row=0, column=1, padx=6)
+        ttk.Button(button_frame, text="Start Matching", command=self.run_matcher, style="Accent.TButton").grid(row=0, column=1, padx=6)
 
         for column in range(2):
             self.columnconfigure(column, weight=1)
@@ -118,30 +119,86 @@ class FormFrame(ttk.Frame):
         name_entry.focus_set()
 
     def run_matcher(self):
+        project_root = Path(__file__).resolve().parents[2]
+        exe_locs = [project_root / ("build/Project2.exe" if sys.platform == "win32" else "build/Project2"),
+                    project_root / ("Project2.exe" if sys.platform == "win32" else "Project2")
+                    ]
+        
+        exe = next((exec for exec in exe_locs if exec.exists()), exe_locs[0])
+        csv_path = project_root / "data" / "merged_data_100k.csv"
+
+        sat_value = self.sat_var.get().strip()
+        if sat_value and not sat_value.isdigit():
+            messagebox.showerror("Invalid SAT", "Please enter a number")
+            return
+        
+        tuition_map = {
+            "Any": "",
+            "<$20k": "20000",
+            "$20k–$40k": "40000",
+            "$40k–$60k": "60000",
+            ">$60k": "",
+        }
+
+        acceptance_map = {
+            "Any": "",
+            "<20%" : "0.0", 
+            "20%–50%": "0.2", 
+            "50%–80%": "0.5", 
+            ">80%" : "0.8",
+        }
+        
+        size_map = {
+            "Any": "", 
+            "Small": "500", 
+            "Medium": "5000", 
+            "Large": "15000",
+        }
+
+        state = "" if self.state_var.get() == "Any" else self.state_var.get()
+
+        control = "" if self.control_var.get() == "Any" else self.control_var.get()
+
+        tuition = tuition_map.get(self.tuition_var.get(), "")
+
+        acceptance_rate = acceptance_map.get(self.acceptance_var.get(), "")
+
+        school_size = size_map.get(self.size_var.get(), "")
+
+        sat_score = sat_value
+
+        weight_tuition = "2.0" if tuition else "1.0"
+        weight_acceptance = "2.0" if acceptance_rate else "1.0"
+        weight_sat = "2.0" if sat_score else "1.0"
+        weight_size = "2.0" if school_size != "" else "1.0"
+
         args = [
-            self.name_var.get(),
-            self.sat_var.get(),
-            self.state_var.get(),
-            self.control_var.get(),
-            self.size_var.get(),
-            self.tuition_var.get(),
-            self.acceptance_var.get(),
+            str(csv_path),
+            state,
+            control,
+            tuition,
+            acceptance_rate,
+            sat_score,
+            school_size,
+            weight_tuition,
+            weight_acceptance,
+            weight_sat,
+            weight_size,
         ]
-
-        exe = r"build/Project2.exe" if sys.platform == "win32" else "./Project2"
-
         try:
             result = subprocess.run(
-                [exe] + args,
+                [str(exe)] + args,
                 text=True,
                 capture_output=True,
                 check=True
+                cwd=project_root,
             )
 
         except subprocess.CalledProcessError as e:
-            messagebox.showerror("Error", f"An error occurred while running the matcher:\\n{e.stderr.strip()}")
+            stderr = e.stderr.strip() or "Unknown error."
+            messagebox.showerror("Error", f"An error occurred while running the matcher:\n{stderr}")
         except FileNotFoundError:
-            messagebox.showerror("Error", f"Executable not found: {exe}")
+            messagebox.showerror("Error", "Executable not found.")
 
         output = result.stdout.strip() or "No output from matcher."
         print("Algorithm Output:\\n" + output)

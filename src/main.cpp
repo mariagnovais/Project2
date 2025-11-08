@@ -1,6 +1,9 @@
 #include <iostream>
 #include <vector>
+#include <unordered_set>
+#include <string>
 #include "hashmap_of_hashmaps.h"
+#include "Heap.cpp"
 
 // to print a vector of strings
 void print_vector(const std::string &title, const std::vector<std::string> &v)
@@ -29,6 +32,8 @@ int main()
 	// here the universities may be flipped so if they are just use the bottom for the top and vice versa
 	print_vector("Top 5 SAT scores:", test.top_n_colleges("SAT scores", 5));
 	print_vector("Bottom 5 SAT scores:", test.bottom_n_colleges("SAT scores", 5));
+
+	// College
 
 	return 0;
 }
