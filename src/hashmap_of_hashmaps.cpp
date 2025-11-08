@@ -164,6 +164,7 @@ std::vector<std::string> hashmap_of_hashmaps::recommend_colleges(
     const std::string& control_filter,
     int max_tuition,
     float min_acceptance
+    int min_size;
 ){
     std::unordered_set<std::string> candidates;
     bool first_constraint = true;
@@ -216,6 +217,20 @@ std::vector<std::string> hashmap_of_hashmaps::recommend_colleges(
         if (m && !m->empty()) {
             std::unordered_set<std::string> s;
             std::map<int,std::vector<std::string> >::const_iterator it = m->lower_bound(threshold);
+            for (; it != m->end(); ++it) {
+                const std::vector<std::string>& v = it->second;
+                for (int i = 0; i < (int)v.size(); i++) s.insert(v[i]);
+            }
+            intersect_with(s);
+        }
+    }
+
+    // minimum school size
+    if (min_size > 0) {
+        const std::map<int, std::vector<std::string> >* m = get_category("school size");
+        if (m && !m->empty()) {
+            std::unordered_set<std::string> s;
+            std::map<int,std::vector<std::string> >::const_iterator it = m->lower_bound(min_size);
             for (; it != m->end(); ++it) {
                 const std::vector<std::string>& v = it->second;
                 for (int i = 0; i < (int)v.size(); i++) s.insert(v[i]);
