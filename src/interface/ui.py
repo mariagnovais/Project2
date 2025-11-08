@@ -1,6 +1,7 @@
 from typing import Optional
 import tkinter as tk
 from tkinter import ttk
+from tkinter import messagebox
 import subprocess
 import sys
 
@@ -109,7 +110,7 @@ class FormFrame(ttk.Frame):
         button_frame.grid(row=15, column=0, columnspan=2, pady=(16, 0), sticky="e")
 
         ttk.Button(button_frame, text="Back", command=self.on_back, style="Accent.TButton").grid(row=0, column=0, padx=6)
-        ttk.Button(button_frame, text="Start Matching", command=self.print_summary, style="Accent.TButton").grid(row=0, column=1, padx=6)
+        ttk.Button(button_frame, text="Start Matching", command=self.run_matcher(), style="Accent.TButton").grid(row=0, column=1, padx=6)
 
         for column in range(2):
             self.columnconfigure(column, weight=1)
@@ -127,7 +128,7 @@ class FormFrame(ttk.Frame):
             self.acceptance_var.get(),
         ]
 
-        exe = "Project2.exe" if sys.platform == "win32" else "./Project2"
+        exe = r"build/Project2.exe" if sys.platform == "win32" else "./Project2"
 
         try:
             result = subprocess.run(
@@ -136,13 +137,15 @@ class FormFrame(ttk.Frame):
                 capture_output=True,
                 check=True
             )
-            output = result.stdout.strip() or "No output from matcher."
-            print("Algorithm Output:\\n" + output)
 
         except subprocess.CalledProcessError as e:
-            tk.messagebox.showerror("Error", f"An error occurred while running the matcher:\\n{e.stderr.strip()}")
+            messagebox.showerror("Error", f"An error occurred while running the matcher:\\n{e.stderr.strip()}")
         except FileNotFoundError:
-            tk.messagebox.showerror("Error", f"Executable not found: {exe}")
+            messagebox.showerror("Error", f"Executable not found: {exe}")
+
+        output = result.stdout.strip() or "No output from matcher."
+        print("Algorithm Output:\\n" + output)
+        messagebox.showinfo("Match Results: ", output)
             
     def print_summary(self) -> None:
         summary = (
