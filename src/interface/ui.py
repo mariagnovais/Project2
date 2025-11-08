@@ -223,7 +223,7 @@ class WeightsFrame(ttk.Frame):
             # Slider
             slider = ttk.Scale(
                 parent,
-                from_=0.0,
+                from_=1.0,
                 to=5.0,
                 orient="horizontal",
                 variable=variable,
@@ -262,7 +262,7 @@ class WeightsFrame(ttk.Frame):
 
         # Buttons
         button_frame = ttk.Frame(self, style="Card.TFrame")
-        button_frame.grid(row=8, column=0, columnspan=2, pady=(16, 0), sticky="e")
+        button_frame.grid(row=10, column=0, columnspan=2, pady=(16, 0), sticky="e")
 
         ttk.Button(button_frame, text="Back", command=self.on_back, style="Accent.TButton").grid(row=0, column=0, padx=6)
         ttk.Button(button_frame, text="Run Match", command=self.run_matcher, style="Accent.TButton").grid(row=0, column=1, padx=6)
@@ -294,10 +294,10 @@ class WeightsFrame(ttk.Frame):
         }
         
         size_map = {
-            "Any": 0, 
+            "Any": 1, 
             "Small": 500, 
-            "Medium": 15000, 
-            "Large": 50000,
+            "Medium": 5000, 
+            "Large": 15000,
         }
 
         state = "" if state_str == "Any" else state_str

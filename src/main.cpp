@@ -182,7 +182,8 @@ int main(int argc, char *argv[])
 			state_filter,
 			control_filter,
 			max_tuition,
-			min_acceptance);
+			min_acceptance,
+			undergrad_filter_val);
 
 		if (recommendations.empty())
 		{

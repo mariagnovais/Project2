@@ -194,7 +194,7 @@ public:
         return true;
     }
 
-    std::vector<std::string> recommend_colleges(int n, float wTuition, float wAcceptance, float wSAT, float wUndergrad, int min_sat, const std::string &state_filter, const std::string &control_filter, int max_tuition, float min_acceptance)
+    std::vector<std::string> recommend_colleges(int n, float wTuition, float wAcceptance, float wSAT, float wUndergrad, int min_sat, const std::string &state_filter, const std::string &control_filter, int max_tuition, float min_acceptance, int min_undergrad)
     {
         std::unordered_set<std::string> candidates;
         bool first_constraint = true;
@@ -257,6 +257,23 @@ public:
                 std::unordered_set<std::string> s;
                 std::map<int, std::vector<std::string>>::const_iterator it = m->lower_bound(threshold);
                 for (; it != m->end(); ++it)
+                {
+                    const std::vector<std::string> &v = it->second;
+                    for (int i = 0; i < (int)v.size(); i++)
+                        s.insert(v[i]);
+                }
+                intersect_with(s);
+            }
+        }
+
+        if (min_undergrad > 0)
+        {
+            const std::map<int, std::vector<std::string>> *m = get_category("school size");
+            if (m && !m->empty())
+            {
+                std::unordered_set<std::string> s;
+                std::map<int, std::vector<std::string>>::const_iterator it = m->lower_bound(min_undergrad);
+                for (; it != m->end() && it->first <= min_undergrad; ++it)
                 {
                     const std::vector<std::string> &v = it->second;
                     for (int i = 0; i < (int)v.size(); i++)
