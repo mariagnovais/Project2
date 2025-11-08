@@ -30,5 +30,8 @@ int main()
 	print_vector("Top 5 SAT scores:", test.top_n_colleges("SAT scores", 5));
 	print_vector("Bottom 5 SAT scores:", test.bottom_n_colleges("SAT scores", 5));
 
+	for (auto &colle : test.recommend_colleges(5, 1.0f, 1.0f, 1.0f, 1.0f, 1200, "CA", "Public", 30000, 0.3f)){//print the 10 best choices
+    	std::cout << colle << std::endl;
+	}
 	return 0;
 }
