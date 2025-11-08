@@ -35,3 +35,15 @@ int main()
 	}
 	return 0;
 }
+
+//each input for the reccomend_colleges function respectively:
+//n: number of colleges user wants (10)
+//wTuition: weight for tuition, lower is better (1.0f)
+//wAcceptance: weight for acceptance rate, higher is better (1.0f)
+//wSAT: weight for SAT score, higher is better (1.0f)
+//wUndergrad: weight for undergrad enroll, smaller is better (1.0f)
+//min_sat: min sat score (1200)
+//state_filter: state user wants ("CA") i tried california because it has more schools
+//control_filter: public, private or "" ("Public")
+//max_tuition: maximum tuition (30000)
+//min_acceptance: minimum acceptance rate (0.3f (30% accept rate))
