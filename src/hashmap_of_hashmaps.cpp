@@ -163,8 +163,8 @@ std::vector<std::string> hashmap_of_hashmaps::recommend_colleges(
     const std::string& state_filter,
     const std::string& control_filter,
     int max_tuition,
-    float min_acceptance
-    int min_size;
+    float min_acceptance,
+    int min_size
 ){
     std::unordered_set<std::string> candidates;
     bool first_constraint = true;

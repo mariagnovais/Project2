@@ -45,7 +45,8 @@ public:
         const std::string& state_filter,
         const std::string& control_filter,
         int max_tuition,
-        float min_acceptance
+        float min_acceptance,
+        int min_size
     );
 
 private:
