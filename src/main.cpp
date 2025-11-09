@@ -3,6 +3,7 @@
 #include <unordered_set>
 #include <string>
 #include <sstream>
+#include <cmath>
 #include "hashmap_of_hashmaps.h"
 #include "Heap.h"
 #include <unordered_set>

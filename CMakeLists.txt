@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_executable(Project2
         src/main.cpp
-        src/hashmap_of_hashmaps.h
+        src/hashmap_of_hashmaps.cpp
         src/Heap.cpp
 )
 
