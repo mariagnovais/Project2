@@ -1,5 +1,4 @@
-# College Recommender CLI
-
+# College Matcher
 This repository contains a C++ command-line tool that ranks colleges based on weighted criteria. It ingests a CSV file of college statistics, applies a configurable set of filters, computes weighted scores, and prints the top recommendations using either a heap-based ranking or a hash map search.
 
 ## Prerequisites
@@ -14,7 +13,7 @@ cmake --build build
 This produces the executable `build/Project2` (or `Project2.exe` on Windows).
 
 ## Running the recommender
-Run the python file and input the information needed.
+Run the ui.py file and input the information needed.
 
 It expects 12 arguments in addition to the program name, which you cn add in the frontend. The arguments are:
 | Argument | Description |
