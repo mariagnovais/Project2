@@ -96,7 +96,7 @@ int main(int argc, char *argv[])
 
 	std::string algorithm_choice = get_arg(12, argc, argv);
 
-	const int results_to_show = 5;
+	const int results_to_show = 15;
 	std::ostringstream output;
 
 	if (algorithm_choice == "heap")

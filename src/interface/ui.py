@@ -5,7 +5,7 @@ import subprocess, sys
 from pathlib import Path
 
 def make_label(parent: tk.Widget, text: str, **grid_kwargs: int) -> tk.Label:
-    label = tk.Label(parent, text=text, anchor="w", font=("Courier New", 16), fg="#1d2c79", bg="white")
+    label = tk.Label(parent, text=text, anchor="w", font=("Courier New", 16), fg = "#1d2c79", bg="white")
     label.grid(sticky="ew", pady=(8, 2), **grid_kwargs)
     return label
 
@@ -238,11 +238,11 @@ class WeightsFrame(ttk.Frame):
         create_slider(self, "Campus Size Importance:", self.size_weight_var, 7)
         
         # Add radio buttons for algorithm choice
-        make_label(self, "Algorithm:", row=8, column=0)
+        make_label(self, "Algorithm:", row=9, column=0)
         self.algo_var = tk.StringVar(value="hashmap")
 
         algo_frame = ttk.Frame(self, style="Card.TFrame")
-        algo_frame.grid(row=9, column=0, columnspan=2, sticky="w", pady=(0, 20))
+        algo_frame.grid(row=10, column=0, columnspan=2, sticky="w", pady=(0, 20))
 
         ttk.Radiobutton(
             algo_frame,
@@ -262,7 +262,7 @@ class WeightsFrame(ttk.Frame):
 
         # Buttons
         button_frame = ttk.Frame(self, style="Card.TFrame")
-        button_frame.grid(row=10, column=0, columnspan=2, pady=(16, 0), sticky="e")
+        button_frame.grid(row=11, column=0, columnspan=2, pady=(16, 0), sticky="e")
 
         ttk.Button(button_frame, text="Back", command=self.on_back, style="Accent.TButton").grid(row=0, column=0, padx=6)
         ttk.Button(button_frame, text="Run Match", command=self.run_matcher, style="Accent.TButton").grid(row=0, column=1, padx=6)
